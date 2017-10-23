@@ -1,0 +1,384 @@
+{% extends 'AppBundle:Accueil:base.html.twig' %}
+
+{% block title %}Growth Hacking{% endblock %}
+
+{% block stylesheets %}
+    {% stylesheets '@AppBundle/Resources/public/css/*' %}
+        <link rel="stylesheet" href="{{ asset_url }}">
+    {% endstylesheets %}
+{% endblock %}
+
+{% block body %}
+    <div id="welcome-container">
+        <h1>Growth Hacking</h1>
+        <p>Welcome on GrowthHacking Bundle ! Hope you will grow faster now !</p>
+
+        <div id="menu-container">
+            <h2 class="no-margin-bottom">Facebook</h2>
+            <div id="page-btn" class="btn darkblue-btn">Trouver des pages</div>
+            <div id="added-page-btn" class="btn darkblue-btn">Voir les pages ajoutées</div>
+            <div id="user-btn" class="btn darkblue-btn">Contacter des users</div>
+            <div id="contacted-user-btn" class="btn darkblue-btn">Voir les users contactés</div>
+            <h2 class="no-margin-bottom">Twitter</h2>
+            <div id="find-twitter-user-btn" class="btn darkblue-btn">Contacter des users</div>
+            <div id="contacted-twitter-user-btn" class="btn darkblue-btn">Voir les users contactés</div>
+        </div>
+    </div>
+    <hr>
+
+    <div id="search-page-container">
+        <h2>Chercher par mots-clés</h2>
+        <div id="del-pages-btn" class="btn red-btn">Supprimer les pages ajoutées</div><br>
+        <input id="input-keyword" class="input" placeholder="Entrez un mot-clé">
+        <div id="sendData-btn" class="btn">Envoyer</div>
+        <div id="tab-data-page"></div>
+    </div>
+
+    <div id="added-page-container">
+        <h2>Pages ajoutées</h2>
+        <div id="tab-added-page"></div>
+    </div>
+
+    <div id="add-user-container">
+        <h2>Contacter des users</h2>
+        <div id="tab-data-user"></div>
+    </div>
+
+    <div id="contacted-user-container">
+        <h2>Users contactés</h2>
+        <div id="tab-contacted-user"></div>
+    </div>
+
+    <div id="search-twitter-user-container">
+        <h2>Chercher par mots-clés dans un tweet</h2>
+        <input id="input-keyword-twitter" class="input" placeholder="Entrez un mot-clé">
+        <div id="sendTwitterData-btn" class="btn">Envoyer</div>
+        <div id="tab-twitter-user"></div>
+    </div>
+
+    <div id="contacted-twitter-user-container">
+        <h2>Users contactés</h2>
+        <div id="tab-contacted-twitter-user"></div>
+    </div>
+
+
+{% endblock %}
+
+{% block javascripts %}
+    {% javascripts '@AppBundle/Resources/public/js/*' %}
+        <script src="{{ asset_url }}"></script>
+        <script src="{{ path('fos_js_routing_js', { callback: 'fos.Router.setData' }) }}"></script>
+    {% endjavascripts %}
+    <script>
+        //switch the button style
+        function switchButton(button) {
+            //if it's a button to add a page
+            if(button.hasClass("add-page")) {
+                button.removeClass('add-page green-btn');
+                button.addClass('suppr-page red-btn');
+
+                button.html('Supprimer');
+            }
+            else if(button.hasClass("suppr-page")) {
+                button.addClass('add-page green-btn');
+                button.removeClass('suppr-page red-btn');
+
+                button.html('Ajouter');
+            }
+            else if(button.hasClass("contact-user-btn")) {
+                button.removeClass('contact-user-btn green-btn');
+                button.addClass('already-contacted-btn red-btn');
+
+                button.html('Profil consulté');
+            }
+            else if(button.hasClass("contact-twitter-user-btn")) {
+                button.removeClass('contact-twitter-user-btn green-btn');
+                button.addClass('already-contacted-btn red-btn');
+
+                button.html('Profil consulté');
+            }
+        }
+
+        window.fbAsyncInit = function() {
+            FB.init({
+                appId            : '151487542123473',
+                autoLogAppEvents : true,
+                xfbml            : true,
+                version          : 'v2.10',
+                //status: false
+            });
+            console.log("FbasyncInit");
+            FB.AppEvents.logPageView();
+
+            $(document).ready(function() {
+                var accessToken;
+
+                /*
+                 * After we get token we can do what we want
+                 */
+                //if we click to display the search page interface
+                $(document).on("click","#page-btn", function() {
+                    // Ajouté par Flo
+                    FB.login(function(response) {
+                        if (response.authResponse) {
+                            console.log('Welcome!  Fetching your information.... ');
+                            accessToken = response.authResponse.accessToken;
+                            FB.api('/me', function(response) {
+                                console.log('Good to see you, ' + response.name + '.');
+                            });
+                        } else {
+                            console.log('User cancelled login or did not fully authorize.');
+                        }
+                    });
+                    // Fin ajout Flo
+
+                    $('#search-page-container').show();
+                    $('#add-user-container').hide();
+                    $('#added-page-container').hide();
+                    $('#contacted-user-container').hide();
+                    $('#search-twitter-user-container').hide();
+                    $('#contacted-twitter-user-container').hide();
+                });
+                //if we click to display the search user interface
+                $(document).on("click","#user-btn", function() {
+                    $('#add-user-container').show();
+                    $('#search-page-container').hide();
+                    $('#added-page-container').hide();
+                    $('#contacted-user-container').hide();
+                    $('#search-twitter-user-container').hide();
+                    $('#contacted-twitter-user-container').hide();
+
+                    //search new users
+                    $('#tab-data-user').html('Loading ..');
+
+                    var token = accessToken;
+                    var path = Routing.generate("growth_ajax_list_users");
+                    var json = {"token": token};
+
+                    $.post(path, json, function (response) {
+                        $('#tab-data-user').html('');
+                        //display in the div
+                        $('#tab-data-user').append(response.result);
+                    })
+                });
+                //if we click to display the added page interface
+                $(document).on("click","#added-page-btn", function() {
+                    $('#added-page-container').show();
+                    $('#add-user-container').hide();
+                    $('#search-page-container').hide();
+                    $('#contacted-user-container').hide();
+                    $('#search-twitter-user-container').hide();
+                    $('#contacted-twitter-user-container').hide();
+
+                    $('#tab-added-page').html('Loading ..');
+                    //show added pages
+                    var path = Routing.generate("growth_ajax_list_added_pages");
+                    var json = {};
+
+                    $.post(path, json, function (response) {
+                        $('#tab-added-page').html('');
+                        //display in the div
+                        $('#tab-added-page').append(response.result);
+                    })
+                });
+                //if we click to display the contacted user interface
+                $(document).on("click","#contacted-user-btn", function() {
+                    $('#contacted-user-container').show();
+                    $('#add-user-container').hide();
+                    $('#search-page-container').hide();
+                    $('#added-page-container').hide();
+                    $('#search-twitter-user-container').hide();
+                    $('#contacted-twitter-user-container').hide();
+
+                    $('#tab-contacted-user').html('Loading ..');
+                    //show contacted user
+                    var path = Routing.generate("growth_ajax_list_contacted_users");
+                    var json = {};
+
+                    $.post(path, json, function (response) {
+                        $('#tab-contacted-user').html('');
+                        //display in the div
+                        $('#tab-contacted-user').append(response.result);
+                    })
+                });
+
+                //if we send the keyword for the pages
+                $(document).on("click","#sendData-btn", function() {
+                    $('#tab-data-page').html('Loading ..');
+                    //send the token and keywords to the server
+                    var token = accessToken;
+                    var keyword = $('#input-keyword').val();
+                    var path = Routing.generate("growth_ajax_list_pages");
+                    var json = {"token": token, "keyword": keyword};
+                    console.log("Token " + token + ", Keyword : " + keyword);
+
+                    $.post(path, json, function (response) {
+                        $('#tab-data-page').html('');
+                        //display in the div
+                        $('#tab-data-page').append(response.result);
+                    })
+                });
+                //if we click to add a page
+                $(document).on('click', '.add-page', function() {
+                    var button = $(this);
+                    var id = button.attr("data-id");
+                    var name = button.attr("data-name");
+
+                    console.log("add page : "+ id);
+
+                    //call to server to add in database
+                    var path = Routing.generate("growth_add_page");
+                    var json = {"id": id, 'name': name};
+
+                    $.post(path, json, function (response) {
+                        //display in the div
+                        switchButton(button);
+                    })
+                });
+                //if we click to delete a page
+                $(document).on('click', '.suppr-page', function() {
+                    var button = $(this);
+                    var id = button.attr("data-id");
+                    var name = button.attr("data-name");
+
+                    console.log("del page : "+ id);
+
+                    //call to server to add in database
+                    var path = Routing.generate("growth_delete_page");
+                    var json = {"id": id, 'name': name};
+
+                    $.post(path, json, function (response) {
+                        //display in the div
+                        if(response.code != 500)
+                            switchButton(button);
+                    })
+                });
+                //if we click to delete an added page
+                $(document).on('click', '.suppr-page-fade', function() {
+                    var button = $(this);
+                    var id = button.attr("data-id");
+                    var name = button.attr("data-name");
+                    var ligneTab = $('tr[data-id = '+id+']');
+
+                    console.log("del page : "+ id);
+
+                    //call to server to add in database
+                    var path = Routing.generate("growth_delete_page");
+                    var json = {"id": id, 'name': name};
+
+                    $.post(path, json, function (response) {
+                        //display in the div
+                        if(response.code != 500)
+                            ligneTab.fadeOut();
+                    })
+                });
+                //if we click to delete all pages
+                $(document).on('click', '#del-pages-btn', function() {
+                   var path = Routing.generate('growth_delete_all_pages');
+                   var json = {};
+
+                    $.post(path, json, function (response) {
+                       console.log(response.msg);
+                    })
+                });
+                //if we click to add a user
+                $(document).on('click', '.contact-user-btn', function() {
+                    var button = $(this);
+                    var id = button.attr("data-id");
+                    var name = button.attr("data-name");
+
+                    console.log("contact user : "+ id);
+
+                    //call to server to add in database
+                    var path = Routing.generate("growth_contact_user");
+                    var json = {"id": id, 'name': name};
+
+                    $.post(path, json, function (response) {
+                        //display in the div
+                        switchButton(button);
+                    })
+                });
+
+                //TWITTER
+
+                //if we click to display the contacted user interface
+                $(document).on("click","#find-twitter-user-btn", function() {
+                    $('#search-twitter-user-container').show();
+                    $('#contacted-user-container').hide();
+                    $('#add-user-container').hide();
+                    $('#search-page-container').hide();
+                    $('#added-page-container').hide();
+                    $('#contacted-twitter-user-container').hide();
+
+                    //search new users
+                    $('#tab-data-user').html('Loading ..');
+
+                });
+
+                $(document).on("click","#sendTwitterData-btn", function() {
+                    $('#tab-twitter-user').html('Loading ..');
+                    //send the token and keywords to the server
+                    //var token = accessToken;
+                    var keyword = $('#input-keyword-twitter').val();
+                    var path = Routing.generate("growth_ajax_list_users_twitter");
+                    var json = {"keyword": keyword};
+
+                    $.post(path, json, function (response) {
+                        $('#tab-twitter-user').html('');
+                        //display in the div
+                        $('#tab-twitter-user').append(response.result);
+                    })
+                });
+
+                //if we click to display the contacted user interface
+                $(document).on("click","#contacted-twitter-user-btn", function() {
+                    $('#contacted-twitter-user-container').show();
+                    $('#search-twitter-user-container').hide();
+                    $('#contacted-user-container').hide();
+                    $('#add-user-container').hide();
+                    $('#search-page-container').hide();
+                    $('#added-page-container').hide();
+
+                    $('#tab-contacted-twitter-user').html('Loading ..');
+                    //show contacted user
+                    var path = Routing.generate("growth_ajax_list_contacted_users_twitter");
+                    var json = {};
+
+                    $.post(path, json, function (response) {
+                        $('#tab-contacted-twitter-user').html('');
+                        //display in the div
+                        $('#tab-contacted-twitter-user').append(response.result);
+                    })
+                });
+
+                //if we click to add a twitter user
+                $(document).on('click', '.contact-twitter-user-btn', function() {
+                    var button = $(this);
+                    var id = button.attr("data-id");
+                    var name = button.attr("data-name");
+                    var info = button.attr("data-info");
+
+                    console.log("contact twitter user : "+ id);
+
+                    //call to server to add in database
+                    var path = Routing.generate("growth_contact_twitter_user");
+                    var json = {"id": id, 'name': name, 'info':info};
+
+                    $.post(path, json, function (response) {
+                        //display in the div
+                        switchButton(button);
+                    })
+                });
+
+            });
+        };
+
+        (function(d, s, id){
+            var js, fjs = d.getElementsByTagName(s)[0];
+            if (d.getElementById(id)) {return;}
+            js = d.createElement(s); js.id = id;
+            js.src = "//connect.facebook.net/en_US/sdk.js";
+            fjs.parentNode.insertBefore(js, fjs);
+        }(document, 'script', 'facebook-jssdk'));
+    </script>
+{% endblock %}

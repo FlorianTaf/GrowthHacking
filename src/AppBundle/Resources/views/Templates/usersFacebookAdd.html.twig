@@ -1,0 +1,32 @@
+<table id="tabResultUser" class="tableau">
+    <thead>
+    <tr>
+        <th>Nom</th>
+        <th>Id</th>
+        <th>Options</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% if userArray is not empty %}
+        {% for user in userArray %}
+            <tr>
+                <td>{{ user.name }}</td>
+                <td>{{ user.id }}</td>
+                <td>
+                    <a href="https://www.facebook.com/{{ user.id }}" target="_blank">
+                        {% if user.id in contactedUsers %}
+                        <div class="already-contacted-btn btn red-btn" data-id={{ user.id }} data-name='{{ user.name }}'>Profil consulté</div>
+                        {% else %}
+                        <div class="contact-user-btn btn green-btn" data-id={{ user.id }} data-name='{{ user.name }}'>Contacter</div>
+                        {% endif %}
+                    </a>
+                </td>
+            </tr>
+        {% endfor %}
+    {% else %}
+        <tr>
+            <td colspan=3>Impossible de trouver des utilisateurs parmis les pages ajoutées</td>
+        </tr>
+    {% endif %}
+    </tbody>
+</table>

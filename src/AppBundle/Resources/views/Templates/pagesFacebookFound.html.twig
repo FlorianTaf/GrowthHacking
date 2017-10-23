@@ -1,0 +1,28 @@
+<table id="tabResult" class="tableau">
+    <thead>
+        <tr>
+            <th>Nom</th>
+            <th>Options</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% if tabResult is not empty %}
+            {% for line in tabResult %}
+            <tr>
+                <td>{{ line.name }}</td>
+                <td>
+                    {% if line.id in pagesVerifArray %}
+                    <div class="suppr-page btn red-btn" data-id={{ line.id }} data-name='{{ line.name }}'>Supprimer</div>
+                    {% else %}
+                    <div class="add-page btn green-btn" data-id={{ line.id }} data-name='{{ line.name }}'>Ajouter</div>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        {% else %}
+            <tr>
+                <td colspan=3>Impossible de trouver des pages à partir des mots-clés entrés</td>
+            </tr>
+        {% endif %}
+    </tbody>
+</table>

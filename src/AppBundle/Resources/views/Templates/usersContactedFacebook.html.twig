@@ -1,0 +1,28 @@
+<table id="tabResultUser" class="tableau">
+    <thead>
+    <tr>
+        <th>Nom</th>
+        <th>Id</th>
+        <th>Options</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% if tabResult is not empty %}
+        {% for user in tabResult %}
+            <tr>
+                <td>{{ user.name }}</td>
+                <td>{{ user.id }}</td>
+                <td>
+                    <a href="https://www.facebook.com/{{ user.id }}" target="_blank">
+                        <div class="see-profil-btn btn green-btn" data-id={{ user.id }}>Voir profil</div>
+                    </a>
+                </td>
+            </tr>
+        {% endfor %}
+    {% else %}
+        <tr>
+            <td colspan=3>Aucun utilisateur ajouté</td>
+        </tr>
+    {% endif %}
+    </tbody>
+</table>

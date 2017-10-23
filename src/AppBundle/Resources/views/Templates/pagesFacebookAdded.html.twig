@@ -1,0 +1,24 @@
+<table id="tabResultAddedPage" class="tableau">
+    <thead>
+    <tr>
+        <th>Nom</th>
+        <th>Options</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% if tabResult is not empty %}
+        {% for line in tabResult %}
+            <tr data-id={{ line.id }}>
+                <td>{{ line.name }}</td>
+                <td>
+                    <div class="suppr-page-fade btn red-btn" data-id={{ line.id }} data-name='{{ line.name }}'>Supprimer</div>
+                </td>
+            </tr>
+        {% endfor %}
+    {% else %}
+        <tr>
+            <td colspan=3>Aucune pages ajoutées</td>
+        </tr>
+    {% endif %}
+    </tbody>
+</table>

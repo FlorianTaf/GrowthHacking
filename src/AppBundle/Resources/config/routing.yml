@@ -1,0 +1,91 @@
+growth_hacking_homepage:
+    path:     /growth_hacking
+    defaults: { _controller: AppBundle:Accueil:index }
+
+growth_ajax_list_pages:
+    path:     /ajax/growth/listPages
+    defaults: { _controller: AppBundle:Growth:listPages }
+    requirements:
+        methods:  POST
+    options:
+        expose: true
+
+growth_add_page:
+    path:     /growth/addPage
+    defaults: { _controller: AppBundle:Growth:addPage }
+    requirements:
+        methods:  POST
+    options:
+        expose: true
+
+growth_delete_page:
+    path:     /growth/deletePage
+    defaults: { _controller: AppBundle:Growth:deletePage }
+    requirements:
+        methods:  POST
+    options:
+        expose: true
+
+growth_ajax_list_users:
+    path:     /ajax/growth/listUsers
+    defaults: { _controller: AppBundle:Growth:listUsers }
+    requirements:
+        methods:  POST
+    options:
+        expose: true
+
+growth_delete_all_pages:
+    path:     /growth/deleteAllpages
+    defaults: { _controller: AppBundle:Growth:emptyAll }
+    requirements:
+        methods:  POST
+    options:
+        expose: true
+
+growth_ajax_list_added_pages:
+    path:     /ajax/growth/listAddedPages
+    defaults: { _controller: AppBundle:Growth:listAddedPages }
+    requirements:
+        methods:  POST
+    options:
+        expose: true
+
+growth_contact_user:
+    path:     /growth/contactUser
+    defaults: { _controller: AppBundle:Growth:contactUser }
+    requirements:
+        methods:  POST
+    options:
+        expose: true
+
+growth_ajax_list_contacted_users:
+    path:     /ajax/growth/listContactedUsers
+    defaults: { _controller: AppBundle:Growth:listContactedUsers }
+    requirements:
+        methods:  POST
+    options:
+        expose: true
+
+growth_ajax_list_users_twitter:
+    path:     /ajax/growth/ListTwitter
+    defaults: { _controller: AppBundle:Growth:listTwitter }
+    requirements:
+        methods:  POST
+    options:
+        expose: true
+
+growth_ajax_list_contacted_users_twitter:
+    path:     /ajax/growth/listContactedTwitterUser
+    defaults: { _controller: AppBundle:Growth:listContactedUsersTwitter }
+    requirements:
+        methods:  POST
+    options:
+        expose: true
+
+growth_contact_twitter_user:
+    path:     /growth/contactTwitterUser
+    defaults: { _controller: AppBundle:Growth:contactTwitterUser }
+    requirements:
+        methods:  POST
+    options:
+        expose: true
