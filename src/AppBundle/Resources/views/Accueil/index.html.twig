@@ -5,6 +5,8 @@
 {% block stylesheets %}
     {% stylesheets '@AppBundle/Resources/public/css/*' %}
         <link rel="stylesheet" href="{{ asset_url }}">
+        <link href="http://rawgit.com/saribe/toastr8/master/dist/css/toastr8.min.css" rel="stylesheet"/>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     {% endstylesheets %}
 {% endblock %}
 
@@ -15,49 +17,49 @@
 
         <div id="menu-container">
             <h2 class="no-margin-bottom">Facebook</h2>
-            <div id="page-btn" class="btn darkblue-btn">Trouver des pages</div>
-            <div id="added-page-btn" class="btn darkblue-btn">Voir les pages ajoutées</div>
-            <div id="user-btn" class="btn darkblue-btn">Contacter des users</div>
-            <div id="contacted-user-btn" class="btn darkblue-btn">Voir les users contactés</div>
+            <div id="page-btn" class="btn darkblue-btn">Find pages</div>
+            <div id="added-page-btn" class="btn darkblue-btn">See added pages</div>
+            <div id="user-btn" class="btn darkblue-btn">Contact users</div>
+            <div id="contacted-user-btn" class="btn darkblue-btn">See contacted users</div>
             <h2 class="no-margin-bottom">Twitter</h2>
-            <div id="find-twitter-user-btn" class="btn darkblue-btn">Contacter des users</div>
-            <div id="contacted-twitter-user-btn" class="btn darkblue-btn">Voir les users contactés</div>
+            <div id="find-twitter-user-btn" class="btn darkblue-btn">Contact users</div>
+            <div id="contacted-twitter-user-btn" class="btn darkblue-btn">See contacted users</div>
         </div>
     </div>
     <hr>
 
     <div id="search-page-container">
-        <h2>Chercher par mots-clés</h2>
-        <div id="del-pages-btn" class="btn red-btn">Supprimer les pages ajoutées</div><br>
+        <h2>Search by keywords</h2>
+        <div id="del-pages-btn" class="btn red-btn" style="display: none;">Delete added pages</div><br>
         <input id="input-keyword" class="input" placeholder="Entrez un mot-clé">
-        <div id="sendData-btn" class="btn">Envoyer</div>
+        <div id="sendData-btn" class="btn">Search</div>
         <div id="tab-data-page"></div>
     </div>
 
     <div id="added-page-container">
-        <h2>Pages ajoutées</h2>
+        <h2>Added pages</h2>
         <div id="tab-added-page"></div>
     </div>
 
     <div id="add-user-container">
-        <h2>Contacter des users</h2>
+        <h2>Contact users</h2>
         <div id="tab-data-user"></div>
     </div>
 
     <div id="contacted-user-container">
-        <h2>Users contactés</h2>
+        <h2>Users contacted</h2>
         <div id="tab-contacted-user"></div>
     </div>
 
     <div id="search-twitter-user-container">
-        <h2>Chercher par mots-clés dans un tweet</h2>
+        <h2>Search by keywords in a tweet</h2>
         <input id="input-keyword-twitter" class="input" placeholder="Entrez un mot-clé">
-        <div id="sendTwitterData-btn" class="btn">Envoyer</div>
+        <div id="sendTwitterData-btn" class="btn">Send</div>
         <div id="tab-twitter-user"></div>
     </div>
 
     <div id="contacted-twitter-user-container">
-        <h2>Users contactés</h2>
+        <h2>Users contacted</h2>
         <div id="tab-contacted-twitter-user"></div>
     </div>
 
@@ -68,6 +70,7 @@
     {% javascripts '@AppBundle/Resources/public/js/*' %}
         <script src="{{ asset_url }}"></script>
         <script src="{{ path('fos_js_routing_js', { callback: 'fos.Router.setData' }) }}"></script>
+        <script src="http://rawgit.com/saribe/toastr8/master/dist/js/toastr8.min.js"></script>
     {% endjavascripts %}
     <script>
         //switch the button style
@@ -118,29 +121,51 @@
                  */
                 //if we click to display the search page interface
                 $(document).on("click","#page-btn", function() {
-                    // Ajouté par Flo
                     FB.login(function(response) {
                         if (response.authResponse) {
                             console.log('Welcome!  Fetching your information.... ');
                             accessToken = response.authResponse.accessToken;
                             FB.api('/me', function(response) {
                                 console.log('Good to see you, ' + response.name + '.');
+                                var userImg = "http://graph.facebook.com/" + response.id + "/picture?type=normal";
+                                toastr8.facebook({
+                                    message : 'Hello ' + response.name + ' !',
+                                    title: "Connexion successfull !",
+                                    imgURI: userImg,
+                                    timeOut: 5000
+                                });
                             });
+
+                            $('#search-page-container').show();
+                            $('#add-user-container').hide();
+                            $('#added-page-container').hide();
+                            $('#contacted-user-container').hide();
+                            $('#search-twitter-user-container').hide();
+                            $('#contacted-twitter-user-container').hide();
+
                         } else {
                             console.log('User cancelled login or did not fully authorize.');
+                            toastr8.error({
+                                title: "Connexion mandatory !",
+                                message: "You must login first to search on Facebook !",
+                                iconClass: "fa fa-warning",
+                                timeOut: 5000
+                            });
                         }
                     });
-                    // Fin ajout Flo
-
-                    $('#search-page-container').show();
-                    $('#add-user-container').hide();
-                    $('#added-page-container').hide();
-                    $('#contacted-user-container').hide();
-                    $('#search-twitter-user-container').hide();
-                    $('#contacted-twitter-user-container').hide();
                 });
                 //if we click to display the search user interface
                 $(document).on("click","#user-btn", function() {
+                    if (accessToken == undefined) {
+                        toastr8.error({
+                            title: "Connexion mandatory !",
+                            message: "You must login first to search on Facebook !",
+                            iconClass: "fa fa-warning",
+                            timeOut: 5000
+                        });
+                        return false;
+                    }
+
                     $('#add-user-container').show();
                     $('#search-page-container').hide();
                     $('#added-page-container').hide();
@@ -152,6 +177,7 @@
                     $('#tab-data-user').html('Loading ..');
 
                     var token = accessToken;
+                    console.log("Token contacted user : " + accessToken);
                     var path = Routing.generate("growth_ajax_list_users");
                     var json = {"token": token};
 
@@ -204,6 +230,7 @@
 
                 //if we send the keyword for the pages
                 $(document).on("click","#sendData-btn", function() {
+                    $('#del-pages-btn').hide();
                     $('#tab-data-page').html('Loading ..');
                     //send the token and keywords to the server
                     var token = accessToken;
@@ -213,6 +240,7 @@
                     console.log("Token " + token + ", Keyword : " + keyword);
 
                     $.post(path, json, function (response) {
+                        $('#del-pages-btn').show();
                         $('#tab-data-page').html('');
                         //display in the div
                         $('#tab-data-page').append(response.result);

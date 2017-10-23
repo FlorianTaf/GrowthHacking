@@ -2,7 +2,7 @@
     <thead>
     <tr>
         <th>UserId</th>
-        <th>Nom</th>
+        <th>Name</th>
         <th>Tweet</th>
         <th>Options</th>
     </tr>
@@ -16,10 +16,11 @@
                 <td class="width20-text padding-10">{{ user.text }}</td>
                 <td>
                     <a href="https://www.twitter.com/{{ user.name }}" target="_blank">
+                        {# Si le profil est déjà présent dans la BDD (donc déjà recherché), alors on l'annonce comme déjà consulté #}
                         {% if user.id in contactedUsers %}
-                            <div class="already-contacted-btn btn red-btn margin-10" data-id={{ user.id }} data-info='{{ user.text }}' data-name='{{ user.name }}'>Profil consulté</div>
+                            <div class="already-contacted-btn btn red-btn margin-10" data-id={{ user.id }} data-info='{{ user.text }}' data-name='{{ user.name }}'>Profile already seen</div>
                         {% else %}
-                            <div class="contact-twitter-user-btn btn green-btn margin-10" data-id={{ user.id }} data-info='{{ user.text }}' data-name='{{ user.name }}'>Consulter Profil</div>
+                            <div class="contact-twitter-user-btn btn green-btn margin-10" data-id={{ user.id }} data-info='{{ user.text }}' data-name='{{ user.name }}'>See profile</div>
                         {% endif %}
                     </a>
                 </td>
@@ -27,7 +28,7 @@
         {% endfor %}
     {% else %}
         <tr>
-            <td colspan=3>Aucun utilisateur trouvé</td>
+            <td colspan=3>No user found</td>
         </tr>
     {% endif %}
     </tbody>

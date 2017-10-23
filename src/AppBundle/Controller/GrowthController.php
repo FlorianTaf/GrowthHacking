@@ -14,6 +14,15 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 
 class GrowthController extends Controller
 {
+    private function getFacebookApi()
+    {
+        $fb = new Facebook([
+            'app_id' => '151487542123473',
+            'app_secret' => '5fb4fd9c7785c7da8a147587fea161d8',
+            'default_graph_version' => 'v2.5',
+        ]);
+        return $fb;
+    }
     /*
      * desc:
      * - Return a view with all the page found on fb with the keyword
@@ -23,11 +32,7 @@ class GrowthController extends Controller
         $keyword = $request->request->get("keyword");
 
         //Initialize FB var
-        $fb = new Facebook([
-          'app_id' => '151487542123473',
-          'app_secret' => '5fb4fd9c7785c7da8a147587fea161d8',
-          'default_graph_version' => 'v2.5',
-        ]);
+        $fb = $this->getFacebookApi();
 
         /*
          * Request : get pages by keyword
@@ -44,25 +49,22 @@ class GrowthController extends Controller
 
         //Check if pages are in database
         $dataRepository = $this->getDoctrine()->getRepository('AppBundle:GrowthData');
-        $pageQuery = $dataRepository->createQueryBuilder('e')
-            ->where('e.name LIKE :keyword')
-            ->setParameter('keyword', '%'.$keyword.'%')
-            ->andWhere('e.type like :type')
-            ->setParameter('type', '%page%')
-            ->andWhere('e.website like :website')
-            ->setParameter('website', '%facebook%')
-            ->andWhere('e.softDelete = 0')
-            ->getQuery();
+        $pageQuery = $dataRepository->getPagesInDatabase($keyword, 'facebook');
         $pagesArray = $pageQuery->getResult();
         $pagesIdArray = $this->makeFieldArray($pagesArray, 'websiteId');
 
         // Send the request to Graph
         $response = $fb->getClient()->sendRequest($request);
         $tabResult= $response->getGraphEdge()->asArray();
-        $result = $this->renderView('AppBundle:Templates:pagesFacebookFound.html.twig', array(
-            'tabResult'=>$tabResult,
-            'pagesVerifArray'=>$pagesIdArray));
+        if (count($tabResult) == 0) {
+            $result = $this->renderView('AppBundle:Templates:pagesFacebookFound.html.twig', array(
+                'tabResult'=>$tabResult));
+        } else {
+            $result = $this->renderView('AppBundle:Templates:pagesFacebookFound.html.twig', array(
+                'tabResult'=>$tabResult,
+                'pagesVerifArray'=>$pagesIdArray));
 
+        }
         return new JsonResponse(
             array(
                 'success'=>true,
@@ -163,11 +165,7 @@ class GrowthController extends Controller
         $dataRepository = $this->getDoctrine()->getRepository('AppBundle:GrowthData');
 
         //Initialize FB var
-        $fb = new Facebook([
-            'app_id' => '525978537749750',
-            'app_secret' => '15d82b968542d82f2d2ed56926cfe06f',
-            'default_graph_version' => 'v2.5',
-        ]);
+        $fb = $this->getFacebookApi();
 
         //Get the array of pages' facebookIds
         $pageQuery = $dataRepository->createQueryBuilder('e')
@@ -384,26 +382,28 @@ class GrowthController extends Controller
 
         //Check if pages are in database
         $dataRepository = $this->getDoctrine()->getRepository('AppBundle:GrowthData');
-        $pageQuery = $dataRepository->createQueryBuilder('e')
-            ->where('e.name LIKE :keyword')
-            ->setParameter('keyword', '%'.$keyword.'%')
-            ->andWhere('e.type like :type')
-            ->setParameter('type', '%page%')
-            ->andWhere('e.website like :website')
-            ->setParameter('website', '%twitter%')
-            ->andWhere('e.softDelete = 0')
-            ->getQuery();
+        $pageQuery = $dataRepository->getPagesInDatabase($keyword, 'twitter');
         $pagesArray = $pageQuery->getResult();
         $pagesIdArray = $this->makeFieldArray($pagesArray, 'websiteId');
 
         //Twitter search
-        $bearer = $this->get("bc_twitter")->getBearer();
+        $bearer = $this->container->get("twitter")->getBearer();
         ( !empty($keyword) ) ? $searchQuery = $keyword : $searchQuery = "empty";
-        $tweets = $this->get("bc_twitter")->search($searchQuery, "", "", $bearer);
+        $tweets = $this->container->get("twitter")->search($searchQuery, "", "", $bearer);
         if(!empty($tweets)){
             foreach($tweets as $tweet){
                 $tabResult[] = array("id" => $tweet->user->id, "text" => $tweet->text, "name" => $tweet->user->screen_name);
             }
+        } else {
+            $tabResult= array();
+            $result = $this->renderView('AppBundle:Templates:usersTwitterFound.html.twig', array('tabResult'=>$tabResult));
+            return new JsonResponse(
+                array(
+                    'success' => true,
+                    'keyword' => $keyword,
+                    'result' => $result
+                )
+            );
         }
 
         //check to see if user has been contacted already

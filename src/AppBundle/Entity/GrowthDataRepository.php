@@ -12,5 +12,16 @@ use Doctrine\ORM\EntityRepository;
  */
 class GrowthDataRepository extends EntityRepository
 {
-
+    public function getPagesInDatabase($keyword, $website)
+    {
+        return $this->createQueryBuilder('g')
+            ->where('g.name LIKE :keyword')
+            ->setParameter('keyword', '%'.$keyword.'%')
+            ->andWhere('g.type like :type')
+            ->setParameter('type', '%page%')
+            ->andWhere('g.website like :website')
+            ->setParameter('website', '%'.$website.'%')
+            ->andWhere('g.softDelete = 0')
+            ->getQuery();
+    }
 }

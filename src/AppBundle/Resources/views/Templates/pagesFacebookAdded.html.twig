@@ -1,7 +1,8 @@
 <table id="tabResultAddedPage" class="tableau">
     <thead>
     <tr>
-        <th>Nom</th>
+        <th>Name</th>
+        <th>Page</th>
         <th>Options</th>
     </tr>
     </thead>
@@ -10,14 +11,15 @@
         {% for line in tabResult %}
             <tr data-id={{ line.id }}>
                 <td>{{ line.name }}</td>
+                <td><a href="https://www.facebook.com/{{ line.id }}" target="_blank">{{ line.name }}</a></td>
                 <td>
-                    <div class="suppr-page-fade btn red-btn" data-id={{ line.id }} data-name='{{ line.name }}'>Supprimer</div>
+                    <div class="suppr-page-fade btn red-btn" data-id={{ line.id }} data-name='{{ line.name }}'>Delete</div>
                 </td>
             </tr>
         {% endfor %}
     {% else %}
         <tr>
-            <td colspan=3>Aucune pages ajoutées</td>
+            <td colspan=3>No pages added</td>
         </tr>
     {% endif %}
     </tbody>

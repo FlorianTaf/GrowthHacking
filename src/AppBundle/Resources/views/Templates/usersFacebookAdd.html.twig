@@ -1,7 +1,7 @@
 <table id="tabResultUser" class="tableau">
     <thead>
     <tr>
-        <th>Nom</th>
+        <th>Name</th>
         <th>Id</th>
         <th>Options</th>
     </tr>
@@ -15,9 +15,9 @@
                 <td>
                     <a href="https://www.facebook.com/{{ user.id }}" target="_blank">
                         {% if user.id in contactedUsers %}
-                        <div class="already-contacted-btn btn red-btn" data-id={{ user.id }} data-name='{{ user.name }}'>Profil consulté</div>
+                        <div class="already-contacted-btn btn red-btn" data-id={{ user.id }} data-name='{{ user.name }}'>Profile already seen</div>
                         {% else %}
-                        <div class="contact-user-btn btn green-btn" data-id={{ user.id }} data-name='{{ user.name }}'>Contacter</div>
+                        <div class="contact-user-btn btn green-btn" data-id={{ user.id }} data-name='{{ user.name }}'>Contact</div>
                         {% endif %}
                     </a>
                 </td>
@@ -25,7 +25,7 @@
         {% endfor %}
     {% else %}
         <tr>
-            <td colspan=3>Impossible de trouver des utilisateurs parmis les pages ajoutées</td>
+            <td colspan=3>Impossible to find users among the pages added</td>
         </tr>
     {% endif %}
     </tbody>

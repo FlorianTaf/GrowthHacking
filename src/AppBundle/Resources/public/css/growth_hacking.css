@@ -42,7 +42,8 @@ body {
 #add-user-container,
 #added-page-container,
 #contacted-user-container,
-#search-twitter-user-container{
+#search-twitter-user-container,
+#contacted-twitter-user-container{
     display: none;
 }
 

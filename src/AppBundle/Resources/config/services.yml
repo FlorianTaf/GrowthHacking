@@ -1,4 +1,9 @@
 services:
-#    growth_hacking.example:
-#        class: AppBundle\Example
-#        arguments: ["@service_id", "plain_value", "%parameter%"]
+#   growth_hacking.example:
+#       class: AppBundle\Example
+#       arguments: ["@service_id", "plain_value", "%parameter%"]
+
+    #Service Twitter
+    twitter:
+      class: AppBundle\Services\TwitterService
+      arguments: [ '@doctrine', '@service_container' ]
