@@ -494,4 +494,35 @@ class GrowthController extends Controller
         return new JsonResponse(array('datas' => array(), 'messages' => $msg));
     }
 
+    public function userExistsBlueSquareAction(Request $request)
+    {
+        $email = $request->request->get('email');
+
+        $curl = curl_init();
+
+        curl_setopt_array(
+            $curl, array(
+                CURLOPT_URL => 'localhost:8888/webservice/web/app_dev.php/user_growth_hacking',
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_ENCODING => "",
+                CURLOPT_MAXREDIRS => 10,
+                CURLOPT_TIMEOUT => 30,
+                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                CURLOPT_CUSTOMREQUEST => "POST",
+        ));
+
+        $response = curl_exec($curl);
+        $error = curl_error($curl);
+
+        var_dump("Response avant l'envoi : " . $response);
+        var_dump("Erreur vant l'envoie : " . $error);
+
+        curl_close($curl);
+
+        $response = json_decode($response);
+
+        var_dump("Response après l'envoi : " . $response);
+
+        return $response;
+    }
 }

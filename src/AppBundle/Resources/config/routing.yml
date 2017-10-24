@@ -89,3 +89,9 @@ growth_contact_twitter_user:
         methods:  POST
     options:
         expose: true
+
+growth_ajax_user_bluesquare:
+    path:     /growth/userExistsBlueSquare
+    defaults: { _controller: AppBundle:Growth:userExistsBluesquare }
+    options:
+        expose: true

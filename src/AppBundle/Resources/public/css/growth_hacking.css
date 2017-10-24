@@ -43,7 +43,8 @@ body {
 #added-page-container,
 #contacted-user-container,
 #search-twitter-user-container,
-#contacted-twitter-user-container{
+#contacted-twitter-user-container,
+#isConnected{
     display: none;
 }
 
