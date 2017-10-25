@@ -33,6 +33,9 @@
         </div>
     </div>
     <hr>
+    <div id="loadUser">
+        <i class="fa fa-spinner fa-spin" style="font-size:24px"></i>
+    </div>
 
     <div id="search-page-container">
         <h2>Search by keywords</h2>
@@ -133,29 +136,43 @@
                             console.log('Welcome!  Fetching your information.... ');
                             accessToken = response.authResponse.accessToken;
                             FB.api('/me?fields=name,email', function (response) {
+                                var idUser = response.id;
+                                var nameUser = response.name;
                                 console.log('Good to see you, ' + response.name + '.');
                                 console.log('Email : ' + response.email);
 
                                 //On va vérifier si l'email est présent chez BlueSquare Computing
                                 var email = response.email;
                                 var path = Routing.generate('growth_ajax_user_bluesquare');
-                                var json = {'email' : email};
+                                var json = { "email" : email };
+                                $('#loadUser').show();
 
                                 $.post(path, json, function (response) {
-
-                                })
-
-                                var userImg = "http://graph.facebook.com/" + response.id + "/picture?type=normal";
-                                toastr8.facebook({
-                                    message: 'Hello ' + response.name + ' !',
-                                    title: "Connexion successfull !",
-                                    imgURI: userImg,
-                                    timeOut: 5000
+                                    $('#loadUser').hide();
+                                    var userExists = response.response.userInBDD;
+                                    console.log('Réponse in view : ' + userExists );
+                                    if (userExists == false) {
+                                        toastr8.error({
+                                            title: "Connexion mandatory !",
+                                            message: "You're not registered to http://www.bluesquare.io !",
+                                            iconClass: "fa fa-warning",
+                                            timeOut: 5000
+                                        });
+                                    }
+                                    else {
+                                        var userImg = "http://graph.facebook.com/" + idUser + "/picture?type=normal";
+                                        toastr8.facebook({
+                                            message: 'Hello ' + nameUser + ' !',
+                                            title: "Connexion successfull !",
+                                            imgURI: userImg,
+                                            timeOut: 5000
+                                        });
+                                        $('#isConnected').show();
+                                        $('#isNotConnected').hide();
+                                    }
                                 });
                             });
 
-                            $('#isConnected').show();
-                            $('#isNotConnected').hide();
                         } else {
                             console.log('User cancelled login or did not fully authorize.');
                             toastr8.error({

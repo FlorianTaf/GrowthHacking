@@ -11,6 +11,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class GrowthController extends Controller
 {
@@ -497,32 +498,48 @@ class GrowthController extends Controller
     public function userExistsBlueSquareAction(Request $request)
     {
         $email = $request->request->get('email');
+        $data = array('email' => $email);
 
         $curl = curl_init();
 
         curl_setopt_array(
             $curl, array(
                 CURLOPT_URL => 'localhost:8888/webservice/web/app_dev.php/user_growth_hacking',
+                //CURLOPT_HTTPHEADER => array('Content-Type: application/json'),
                 CURLOPT_RETURNTRANSFER => true,
                 CURLOPT_ENCODING => "",
                 CURLOPT_MAXREDIRS => 10,
                 CURLOPT_TIMEOUT => 30,
                 CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
                 CURLOPT_CUSTOMREQUEST => "POST",
+                CURLOPT_POSTFIELDS => $data,
         ));
 
         $response = curl_exec($curl);
         $error = curl_error($curl);
 
-        var_dump("Response avant l'envoi : " . $response);
-        var_dump("Erreur vant l'envoie : " . $error);
+        if ($error) {
+            //echo "cURL Error #:" . $error;
+        } else {
+            //echo $response;
+        }
 
         curl_close($curl);
 
+        /*
+        return new JsonResponse(
+            array(
+                'response' => $response,
+                'mail' => $email,
+            ));
+        */
+
         $response = json_decode($response);
 
-        var_dump("Response après l'envoi : " . $response);
-
-        return $response;
+        return new JsonResponse(
+            array(
+                'response' => $response,
+                'mail' => $email,
+        ));
     }
 }
