@@ -64,8 +64,8 @@ class GrowthController extends Controller
             $result = $this->renderView('AppBundle:Templates:pagesFacebookFound.html.twig', array(
                 'tabResult'=>$tabResult,
                 'pagesVerifArray'=>$pagesIdArray));
-
         }
+
         return new JsonResponse(
             array(
                 'success'=>true,
