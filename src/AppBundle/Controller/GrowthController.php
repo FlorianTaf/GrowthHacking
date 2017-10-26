@@ -50,20 +50,29 @@ class GrowthController extends Controller
 
         //Check if pages are in database
         $dataRepository = $this->getDoctrine()->getRepository('AppBundle:GrowthData');
-        $pageQuery = $dataRepository->getPagesInDatabase($keyword, 'facebook');
-        $pagesArray = $pageQuery->getResult();
-        $pagesIdArray = $this->makeFieldArray($pagesArray, 'websiteId');
 
         // Send the request to Graph
         $response = $fb->getClient()->sendRequest($request);
         $tabResult= $response->getGraphEdge()->asArray();
+
+
+        $pagesArray = array();
+        $allPages = $dataRepository->findAll();
+        foreach ($tabResult as $result) {
+            foreach ($allPages as $page) {
+                if ($page->getWebSiteId() == $result['id']) {
+                    $pagesArray['id'] = $result['id'];
+                }
+            }
+        }
+
         if (count($tabResult) == 0) {
             $result = $this->renderView('AppBundle:Templates:pagesFacebookFound.html.twig', array(
                 'tabResult'=>$tabResult));
         } else {
             $result = $this->renderView('AppBundle:Templates:pagesFacebookFound.html.twig', array(
                 'tabResult'=>$tabResult,
-                'pagesVerifArray'=>$pagesIdArray));
+                'pagesVerifArray'=>$pagesArray));
         }
 
         return new JsonResponse(
