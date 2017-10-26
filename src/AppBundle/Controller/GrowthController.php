@@ -91,6 +91,20 @@ class GrowthController extends Controller
 
     /*
      * @desc:
+     * - Return an array with the field's value of each entity
+     */
+    private function makeFieldArray($entities, $nameField) {
+        $result = array();
+
+        foreach($entities as $entity) {
+            $result[] = $entity->{'get'.ucfirst($nameField)}();
+        }
+
+        return $result;
+    }
+
+    /*
+     * @desc:
      * - Add a new page in database
      */
     public function addPageAction(Request $request)
@@ -256,13 +270,7 @@ class GrowthController extends Controller
         $dataRepository = $this->getDoctrine()->getRepository('AppBundle:GrowthData');
 
         //Get an array of pages
-        $pageQuery = $dataRepository->createQueryBuilder('e')
-            ->where('e.type like :type')
-            ->setParameter('type', '%page%')
-            ->andWhere('e.website like :website')
-            ->setParameter('website', '%facebook%')
-            ->andWhere('e.softDelete = 0')
-            ->getQuery();
+        $pageQuery = $dataRepository->deleteAllAddedPages();
         $pagesArray = $pageQuery->getResult();
 
         foreach($pagesArray as $pages) {
@@ -274,7 +282,7 @@ class GrowthController extends Controller
         return new JsonResponse(
             array(
                 'success'=>true,
-                'msg'=>'Pages set to softDelete 1',
+                'msg'=>'Pages set to softDelete 1'
             )
         );
     }
@@ -285,7 +293,9 @@ class GrowthController extends Controller
      */
     public function listAddedPagesAction() {
         //Get the array of pages
-        $pagesArray = $this->getDoctrine()->getManager()->getRepository('AppBundle:GrowthData')->findBy(array('type'=>"page", 'website'=>'facebook', 'softDelete'=>0), array('id' => 'DESC'));
+        $pagesArray = $this->getDoctrine()->getManager()->getRepository('AppBundle:GrowthData')->findBy(array(
+            'type'=>"page", 'website'=>'facebook', 'softDelete'=>0), array(
+                'id' => 'DESC'));
 
         $resultArray = array();
         $resultIdArray = array();

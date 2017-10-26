@@ -39,8 +39,6 @@
 
     <div id="search-page-container">
         <h2>Search by keywords</h2>
-        <div id="del-pages-btn" class="btn red-btn" style="display: none;">Delete added pages</div>
-        <br>
         <input id="input-keyword" class="input" placeholder="Entrez un mot-clé">
         <div id="sendData-btn" class="btn">Search</div>
         <div id="tab-data-page"></div>
@@ -48,6 +46,8 @@
 
     <div id="added-page-container">
         <h2>Added pages</h2>
+        <div id="del-pages-btn" class="btn red-btn" style="display: none;">Delete added pages</div>
+        <br>
         <div id="tab-added-page"></div>
     </div>
 
@@ -226,7 +226,7 @@
                         $('#tab-data-user').html('');
                         //display in the div
                         $('#tab-data-user').append(response.result);
-                    })
+                    });
                 });
                 //if we click to display the added page interface
                 $(document).on("click", "#added-page-btn", function () {
@@ -236,6 +236,7 @@
                     $('#contacted-user-container').hide();
                     $('#search-twitter-user-container').hide();
                     $('#contacted-twitter-user-container').hide();
+                    $('#del-pages-btn').hide();
 
                     $('#tab-added-page').html('Loading ..');
                     //show added pages
@@ -244,9 +245,10 @@
 
                     $.post(path, json, function (response) {
                         $('#tab-added-page').html('');
+                        $('#del-pages-btn').show();
                         //display in the div
                         $('#tab-added-page').append(response.result);
-                    })
+                    });
                 });
                 //if we click to display the contacted user interface
                 $(document).on("click", "#contacted-user-btn", function () {
@@ -266,7 +268,7 @@
                         $('#tab-contacted-user').html('');
                         //display in the div
                         $('#tab-contacted-user').append(response.result);
-                    })
+                    });
                 });
 
                 //if we send the keyword for the pages
@@ -281,11 +283,10 @@
                     console.log("Token " + token + ", Keyword : " + keyword);
 
                     $.post(path, json, function (response) {
-                        $('#del-pages-btn').show();
                         $('#tab-data-page').html('');
                         //display in the div
                         $('#tab-data-page').append(response.result);
-                    })
+                    });
                 });
                 //if we click to add a page
                 $(document).on('click', '.add-page', function () {
@@ -302,7 +303,7 @@
                     $.post(path, json, function (response) {
                         //display in the div
                         switchButton(button);
-                    })
+                    });
                 });
                 //if we click to delete a page
                 $(document).on('click', '.suppr-page', function () {
@@ -320,7 +321,7 @@
                         //display in the div
                         if (response.code != 500)
                             switchButton(button);
-                    })
+                    });
                 });
                 //if we click to delete an added page
                 $(document).on('click', '.suppr-page-fade', function () {
@@ -339,7 +340,7 @@
                         //display in the div
                         if (response.code != 500)
                             ligneTab.fadeOut();
-                    })
+                    });
                 });
                 //if we click to delete all pages
                 $(document).on('click', '#del-pages-btn', function () {
@@ -348,7 +349,18 @@
 
                     $.post(path, json, function (response) {
                         console.log(response.msg);
-                    })
+                        $('#tab-added-page').html('Loading ..');
+                        //show added pages
+                        var path = Routing.generate("growth_ajax_list_added_pages");
+                        var json = {};
+
+                        $.post(path, json, function (response) {
+                            $('#tab-added-page').html('');
+                            $('#del-pages-btn').show();
+                            //display in the div
+                            $('#tab-added-page').append(response.result);
+                        });
+                    });
                 });
                 //if we click to add a user
                 $(document).on('click', '.contact-user-btn', function () {
@@ -365,7 +377,7 @@
                     $.post(path, json, function (response) {
                         //display in the div
                         switchButton(button);
-                    })
+                    });
                 });
 
                 //TWITTER
@@ -396,7 +408,7 @@
                         $('#tab-twitter-user').html('');
                         //display in the div
                         $('#tab-twitter-user').append(response.result);
-                    })
+                    });
                 });
 
                 //if we click to display the contacted user interface
@@ -417,7 +429,7 @@
                         $('#tab-contacted-twitter-user').html('');
                         //display in the div
                         $('#tab-contacted-twitter-user').append(response.result);
-                    })
+                    });
                 });
 
                 //if we click to add a twitter user
@@ -436,7 +448,7 @@
                     $.post(path, json, function (response) {
                         //display in the div
                         switchButton(button);
-                    })
+                    });
                 });
 
             });

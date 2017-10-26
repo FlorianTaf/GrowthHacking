@@ -24,4 +24,15 @@ class GrowthDataRepository extends EntityRepository
             ->andWhere('g.softDelete = 0')
             ->getQuery();
     }
+
+    public function deleteAllAddedPages()
+    {
+        return $this->createQueryBuilder('g')
+            ->where('g.type like :type')
+            ->setParameter('type', '%page%')
+            ->andWhere('g.website like :website')
+            ->setParameter('website', '%facebook%')
+            ->andWhere('g.softDelete = 0')
+            ->getQuery();
+    }
 }
