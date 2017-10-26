@@ -187,12 +187,28 @@
 
                 //if we click to display the search page interface
                 $(document).on('click', '#page-btn', function () {
-                    $('#search-page-container').show();
-                    $('#add-user-container').hide();
-                    $('#added-page-container').hide();
-                    $('#contacted-user-container').hide();
-                    $('#search-twitter-user-container').hide();
-                    $('#contacted-twitter-user-container').hide();
+                    FB.getLoginStatus(function(response) {
+                        console.log("Connecté ou pas : " + response.status);
+                        if (response.status != 'unknown') {
+                            $('#search-page-container').show();
+                            $('#add-user-container').hide();
+                            $('#added-page-container').hide();
+                            $('#contacted-user-container').hide();
+                            $('#search-twitter-user-container').hide();
+                            $('#contacted-twitter-user-container').hide();
+                        } else {
+                            $('#isConnected').hide();
+                            $('#isNotConnected').show();
+                            $('#search-page-container').hide();
+                            toastr8.error({
+                                title: "Connexion mandatory !",
+                                message: "You have been logged out, you must login again on Facebook !",
+                                iconClass: "fa fa-warning",
+                                timeOut: 5000
+                            });
+                            return false;
+                        }
+                    }, true);
                 });
 
                 //if we click to display the search user interface

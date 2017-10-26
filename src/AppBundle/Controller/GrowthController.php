@@ -365,7 +365,9 @@ class GrowthController extends Controller
      */
     public function listContactedUsersAction() {
         //Get the array of user
-        $contactedUsersArray = $this->getDoctrine()->getManager()->getRepository('AppBundle:GrowthData')->findBy(array('type'=>"user", 'website'=>'facebook', 'softDelete'=>0,'isContacted'=>1), array('id' => 'DESC'));
+        $contactedUsersArray = $this->getDoctrine()->getManager()->getRepository('AppBundle:GrowthData')->findBy(array(
+            'type'=>"user", 'website'=>'facebook', 'softDelete'=>0,'isContacted'=>1), array(
+                'id' => 'DESC'));
 
         $resultArray = array();
         foreach ($contactedUsersArray as $user) {
@@ -418,12 +420,15 @@ class GrowthController extends Controller
 
         //check to see if user has been contacted already
         $contactedUsersArray = array();
-        $contactedUsers = $this->getDoctrine()->getManager()->getRepository('AppBundle:GrowthData')->findBy(array('type'=>"user", 'website'=>'twitter', 'softDelete'=>0,'isContacted'=>1), array('id' => 'DESC'));
+        $contactedUsers = $this->getDoctrine()->getManager()->getRepository('AppBundle:GrowthData')->findBy(array(
+            'type'=>"user", 'website'=>'twitter', 'softDelete'=>0,'isContacted'=>1), array(
+                'id' => 'DESC'));
 
         foreach ($contactedUsers as $user) {
             array_push($contactedUsersArray, $user->getWebsiteId());
         }
-        $result = $this->renderView('AppBundle:Templates:usersTwitterFound.html.twig', array('tabResult'=>$tabResult, 'pagesVerifArray'=>$pagesIdArray, 'contactedUsers'=>$contactedUsersArray));
+        $result = $this->renderView('AppBundle:Templates:usersTwitterFound.html.twig', array(
+            'tabResult'=>$tabResult, 'pagesVerifArray'=>$pagesIdArray, 'contactedUsers'=>$contactedUsersArray));
 
         return new JsonResponse(
             array(
@@ -440,7 +445,9 @@ class GrowthController extends Controller
      */
     public function listContactedUsersTwitterAction() {
         //Get the array of user
-        $contactedUsersArray = $this->getDoctrine()->getManager()->getRepository('AppBundle:GrowthData')->findBy(array('type'=>"user", 'website'=>'twitter', 'softDelete'=>0,'isContacted'=>1), array('id' => 'DESC'));
+        $contactedUsersArray = $this->getDoctrine()->getManager()->getRepository('AppBundle:GrowthData')->findBy(array(
+            'type'=>"user", 'website'=>'twitter', 'softDelete'=>0,'isContacted'=>1), array(
+                'id' => 'DESC'));
 
         $resultArray = array();
         foreach ($contactedUsersArray as $user) {
