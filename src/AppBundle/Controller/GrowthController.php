@@ -24,6 +24,7 @@ class GrowthController extends Controller
         ]);
         return $fb;
     }
+
     /*
      * desc:
      * - Return a view with all the page found on fb with the keyword
@@ -56,13 +57,16 @@ class GrowthController extends Controller
         $tabResult= $response->getGraphEdge()->asArray();
 
 
-        $pagesArray = array();
         $allPages = $dataRepository->findAll();
+        $webSiteIds = array();
+        foreach ($allPages as $page) {
+            $webSiteIds[] = $page->getWebSiteId();
+        }
+
+        $pagesArray = array();
         foreach ($tabResult as $result) {
-            foreach ($allPages as $page) {
-                if ($page->getWebSiteId() == $result['id']) {
-                    $pagesArray['id'] = $result['id'];
-                }
+            if (in_array($result['id'], $webSiteIds)) {
+                $pagesArray['id'] = $result['id'];
             }
         }
 
@@ -83,20 +87,6 @@ class GrowthController extends Controller
                 'result'=>$result,
             )
         );
-    }
-
-    /*
-     * @desc:
-     * - Return an array with the field's value of each entity
-     */
-    private function makeFieldArray($entities, $nameField) {
-        $result = array();
-
-        foreach($entities as $entity) {
-            $result[] = $entity->{'get'.ucfirst($nameField)}();
-        }
-
-        return $result;
     }
 
     /*
@@ -534,14 +524,6 @@ class GrowthController extends Controller
         }
 
         curl_close($curl);
-
-        /*
-        return new JsonResponse(
-            array(
-                'response' => $response,
-                'mail' => $email,
-            ));
-        */
 
         $response = json_decode($response);
 
