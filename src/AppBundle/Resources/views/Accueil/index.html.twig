@@ -187,48 +187,12 @@
 
                 //if we click to display the search page interface
                 $(document).on('click', '#page-btn', function () {
-                    FB.getLoginStatus(function(response) {
-                        console.log("Connecté ou pas : " + response.status);
-                        if (response.status != 'unknown') {
-                            $('#search-page-container').show();
-                            $('#add-user-container').hide();
-                            $('#added-page-container').hide();
-                            $('#contacted-user-container').hide();
-                            $('#search-twitter-user-container').hide();
-                            $('#contacted-twitter-user-container').hide();
-                        } else {
-                            $('#isConnected').hide();
-                            $('#isNotConnected').show();
-                            $('#search-page-container').hide();
-                            toastr8.error({
-                                title: "Connexion mandatory !",
-                                message: "You have been logged out, you must login again on Facebook !",
-                                iconClass: "fa fa-warning",
-                                timeOut: 5000
-                            });
-                            return false;
-                        }
-                    }, true);
+                    getLoginStatus('pages')
                 });
 
                 //if we click to display the search user interface
                 $(document).on("click", "#user-btn", function () {
-                    if (accessToken == undefined) {
-                        toastr8.error({
-                            title: "Connexion mandatory !",
-                            message: "You must login first to search on Facebook !",
-                            iconClass: "fa fa-warning",
-                            timeOut: 5000
-                        });
-                        return false;
-                    }
-
-                    $('#add-user-container').show();
-                    $('#search-page-container').hide();
-                    $('#added-page-container').hide();
-                    $('#contacted-user-container').hide();
-                    $('#search-twitter-user-container').hide();
-                    $('#contacted-twitter-user-container').hide();
+                    getLoginStatus('users');
 
                     //search new users
                     $('#tab-data-user').html('Loading ..');
@@ -468,6 +432,47 @@
                 });
 
             });
+
+            function getLoginStatus(display) {
+                FB.getLoginStatus(function(response) {
+                    console.log("Connecté ou pas : " + response.status);
+                    if (response.status != 'unknown') {
+                        if (display == 'pages') {
+                            $('#search-page-container').show();
+                            $('#add-user-container').hide();
+                            $('#added-page-container').hide();
+                            $('#contacted-user-container').hide();
+                            $('#search-twitter-user-container').hide();
+                            $('#contacted-twitter-user-container').hide();
+                        }
+                        if (display == 'users') {
+                            $('#add-user-container').show();
+                            $('#search-page-container').hide();
+                            $('#added-page-container').hide();
+                            $('#contacted-user-container').hide();
+                            $('#search-twitter-user-container').hide();
+                            $('#contacted-twitter-user-container').hide();
+                        }
+                    } else {
+                        $('#isConnected').hide();
+                        $('#search-page-container').hide();
+                        $('#added-page-container').hide();
+                        $('#add-user-container').hide();
+                        $('#contacted-user-container').hide();
+                        $('#search-twitter-user-container').hide();
+                        $('#contacted-twitter-user-container').hide();
+                        $('#isNotConnected').show();
+                        toastr8.error({
+                            title: "Connexion mandatory !",
+                            message: "You have been logged out, you must login again on Facebook !",
+                            iconClass: "fa fa-warning",
+                            timeOut: 5000
+                        });
+                        return false;
+                    }
+                }, true); //On passe le paramètre à true, pour qu'il revérifie bien en dehors du cache si on est déconnecté
+                          //Sinon, en pleine déconnexion de page, on ne voit pas la déconnexion
+            };
         };
 
         (function (d, s, id) {
