@@ -520,7 +520,7 @@ class GrowthController extends Controller
 
         curl_setopt_array(
             $curl, array(
-                CURLOPT_URL => 'localhost:8888/webservice/web/app_dev.php/user_growth_hacking',
+                CURLOPT_URL => 'http://webservice.bluesquare.io/user_growth_hacking',
                 //CURLOPT_HTTPHEADER => array('Content-Type: application/json'),
                 CURLOPT_RETURNTRANSFER => true,
                 CURLOPT_ENCODING => "",
