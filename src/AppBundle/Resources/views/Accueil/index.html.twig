@@ -113,6 +113,7 @@
             $(document).ready(function () {
                 var accessToken;
                 var pages;
+                var email;
 
                 /*
                  * After we get token we can do what we want
@@ -130,7 +131,7 @@
                                 console.log('Email : ' + response.email);
 
                                 //On va vérifier si l'email est présent chez BlueSquare Computing
-                                var email = response.email;
+                                email = response.email;
                                 var path = Routing.generate('growth_ajax_user_bluesquare');
                                 var json = { "email" : email };
                                 $('#loadUser').show();
@@ -273,7 +274,7 @@
 
                     //call to server to add in database
                     var path = Routing.generate("growth_add_page");
-                    var json = {"id": id, 'name': name};
+                    var json = {"id": id, 'name': name, "email": email };
 
                     $.post(path, json, function (response) {
                         //display in the div
@@ -288,7 +289,6 @@
 
                     console.log("del page : " + id);
 
-                    //call to server to add in database
                     var path = Routing.generate("growth_delete_page");
                     var json = {"id": id, 'name': name};
 
@@ -307,9 +307,8 @@
 
                     console.log("del page : " + id);
 
-                    //call to server to add in database
                     var path = Routing.generate("growth_delete_page");
-                    var json = {"id": id, 'name': name};
+                    var json = {"id": id, 'name': name, "email": email };
 
                     $.post(path, json, function (response) {
                         //display in the div

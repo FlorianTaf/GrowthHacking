@@ -100,22 +100,24 @@ class GrowthController extends Controller
     public function addPageAction(Request $request)
     {
         $id = $request->request->get('id');
+        $email = $request->request->get("email");
 
-        $entityExist = $this->getDoctrine()->getManager()->getRepository('AppBundle:GrowthData')->findOneBy(array('websiteId'=>$id));
+        $em = $this->getDoctrine()->getManager();
+        $entityExist = $em->getRepository('AppBundle:GrowthData')->findOneBy(array('websiteId'=>$id));
+        $user = $em->getRepository('AppBundle:User')->findOneBy(array('username' => $email));
 
         //verification
         if($entityExist) {
             //If it was a softDelete at 1
             if($entityExist->getSoftDelete() == 1) {
                 $entityExist->setSoftDelete(0); //set it to 0
+                $user->addPage($entityExist);
                 $msg = "Page déjà ajoutée -> softDelete set to 0";
             }else
                 $msg = "Page déjà ajoutée -> pas d'ajout";
 
             //save
-            $em = $this->getDoctrine()->getManager();
             $em->persist($entityExist);
-            $em->flush();
         } else {
             $entity = new GrowthData();
             $name = $request->request->get('name');
@@ -127,9 +129,9 @@ class GrowthController extends Controller
             $entity->setWebsite('facebook');
             $entity->setsoftDelete(0);
             $entity->setIsContacted(0);
+            $user->addPage($entity);
 
             //save
-            $em = $this->getDoctrine()->getManager();
             $em->persist($entity);
             $em->flush();
 
@@ -145,13 +147,19 @@ class GrowthController extends Controller
      */
     public function deletePageAction(Request $request){
         $id = $request->request->get('id');
-        $entity = $this->getDoctrine()->getManager()->getRepository('AppBundle:GrowthData')->findOneBy(array('websiteId'=>$id));
+        $email = $request->request->get('email');
+        $em = $this->getDoctrine()->getManager();
+
+        $entity = $em->getRepository('AppBundle:GrowthData')->findOneBy(array('websiteId'=>$id));
+        $user = $em->getRepository('AppBundle:User')->findOneBy(array('username' => $email));
+
         if ($entity) {
             $success = 200;
             $msg = "Page supprimée";
             $entity->setsoftDelete(1);
-            $this->getDoctrine()->getManager()->persist($entity);
-            $this->getDoctrine()->getManager()->flush();
+            $user->removePage($entity);
+            $em->persist($entity);
+            $em->flush();
         } else {
             $msg = "Erreur";
             $success = 500;
