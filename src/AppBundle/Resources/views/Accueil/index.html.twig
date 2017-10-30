@@ -2,14 +2,6 @@
 
 {% block title %}Growth Hacking{% endblock %}
 
-{% block stylesheets %}
-    {% stylesheets '@AppBundle/Resources/public/css/*' %}
-    <link rel="stylesheet" href="{{ asset_url }}">
-    <link href="http://rawgit.com/saribe/toastr8/master/dist/css/toastr8.min.css" rel="stylesheet"/>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    {% endstylesheets %}
-{% endblock %}
-
 {% block body %}
     <div id="welcome-container">
         <h1>Growth Hacking</h1>
@@ -76,12 +68,7 @@
 
 {% endblock %}
 
-{% block javascripts %}
-    {% javascripts '@AppBundle/Resources/public/js/*' %}
-    <script src="{{ asset_url }}"></script>
-    <script src="{{ path('fos_js_routing_js', { callback: 'fos.Router.setData' }) }}"></script>
-    <script src="http://rawgit.com/saribe/toastr8/master/dist/js/toastr8.min.js"></script>
-    {% endjavascripts %}
+{% block js %}
     <script>
         //switch the button style
         function switchButton(button) {
@@ -125,6 +112,7 @@
 
             $(document).ready(function () {
                 var accessToken;
+                var pages;
 
                 /*
                  * After we get token we can do what we want
@@ -160,15 +148,21 @@
                                         });
                                     }
                                     else {
-                                        var userImg = "http://graph.facebook.com/" + idUser + "/picture?type=normal";
-                                        toastr8.facebook({
-                                            message: 'Hello ' + nameUser + ' !',
-                                            title: "Connexion successfull !",
-                                            imgURI: userImg,
-                                            timeOut: 5000
+                                        var path = Routing.generate('growth_check_user_bdd');
+                                        var json = {"email" : email};
+                                        $.post(path, json, function (response) {
+                                            console.log("Utilisateur : " + response.response);
+                                            pages = response.pages;
+                                            var userImg = "http://graph.facebook.com/" + idUser + "/picture?type=normal";
+                                            toastr8.facebook({
+                                                message: 'Hello ' + nameUser + ' !',
+                                                title: "Connexion successfull !",
+                                                imgURI: userImg,
+                                                timeOut: 5000
+                                            });
+                                            $('#isConnected').show();
+                                            $('#isNotConnected').hide();
                                         });
-                                        $('#isConnected').show();
-                                        $('#isNotConnected').hide();
                                     }
                                 });
                             });
@@ -221,7 +215,7 @@
                     $('#tab-added-page').html('Loading ..');
                     //show added pages
                     var path = Routing.generate("growth_ajax_list_added_pages");
-                    var json = {};
+                    var json = { "pages": pages };
 
                     $.post(path, json, function (response) {
                         $('#tab-added-page').html('');
@@ -259,10 +253,11 @@
                     var token = accessToken;
                     var keyword = $('#input-keyword').val();
                     var path = Routing.generate("growth_ajax_list_pages");
-                    var json = {"token": token, "keyword": keyword};
+                    var json = {"token": token, "keyword": keyword, "pages": pages};
                     console.log("Token " + token + ", Keyword : " + keyword);
 
                     $.post(path, json, function (response) {
+                        console.log("Response : " + response.response);
                         $('#tab-data-page').html('');
                         //display in the div
                         $('#tab-data-page').append(response.result);
@@ -382,7 +377,7 @@
                     //var token = accessToken;
                     var keyword = $('#input-keyword-twitter').val();
                     var path = Routing.generate("growth_ajax_list_users_twitter");
-                    var json = {"keyword": keyword};
+                    var json = {"keyword": keyword, "pages": pages };
 
                     $.post(path, json, function (response) {
                         $('#tab-twitter-user').html('');
@@ -403,7 +398,7 @@
                     $('#tab-contacted-twitter-user').html('Loading ..');
                     //show contacted user
                     var path = Routing.generate("growth_ajax_list_contacted_users_twitter");
-                    var json = {};
+                    var json = { "pages": pages };
 
                     $.post(path, json, function (response) {
                         $('#tab-contacted-twitter-user').html('');

@@ -1,0 +1,143 @@
+<?php
+
+namespace AppBundle\Entity;
+
+use Doctrine\ORM\Mapping as ORM;
+
+/**
+ * User
+ *
+ * @ORM\Table(name="user")
+ * @ORM\Entity(repositoryClass="AppBundle\Entity\UserRepository")
+ */
+class User
+{
+    /**
+     * @var int
+     *
+     * @ORM\Column(name="id", type="integer")
+     * @ORM\Id
+     * @ORM\GeneratedValue(strategy="AUTO")
+     */
+    private $id;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="username", type="string", length=255, unique=true)
+     */
+    private $username;
+
+    /**
+     * @var \DateTime
+     *
+     * @ORM\Column(name="date_first_connexion", type="datetime")
+     */
+    private $dateFirstConnexion;
+
+    /**
+     * @ORM\ManyToMany(targetEntity="AppBundle\Entity\GrowthData", cascade={"persist", "remove"})
+     * @ORM\JoinTable(name="user_pages")
+     */
+    private $pages;
+
+
+    /**
+     * Get id
+     *
+     * @return int
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    /**
+     * Set username
+     *
+     * @param string $username
+     *
+     * @return User
+     */
+    public function setUsername($username)
+    {
+        $this->username = $username;
+
+        return $this;
+    }
+
+    /**
+     * Get username
+     *
+     * @return string
+     */
+    public function getUsername()
+    {
+        return $this->username;
+    }
+
+    /**
+     * Set dateFirstConnexion
+     *
+     * @param \DateTime $dateFirstConnexion
+     *
+     * @return User
+     */
+    public function setDateFirstConnexion($dateFirstConnexion)
+    {
+        $this->dateFirstConnexion = $dateFirstConnexion;
+
+        return $this;
+    }
+
+    /**
+     * Get dateFirstConnexion
+     *
+     * @return \DateTime
+     */
+    public function getDateFirstConnexion()
+    {
+        return $this->dateFirstConnexion;
+    }
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        $this->pages = new \Doctrine\Common\Collections\ArrayCollection();
+    }
+
+    /**
+     * Add page
+     *
+     * @param \AppBundle\Entity\GrowthData $page
+     *
+     * @return User
+     */
+    public function addPage(\AppBundle\Entity\GrowthData $page)
+    {
+        $this->pages[] = $page;
+
+        return $this;
+    }
+
+    /**
+     * Remove page
+     *
+     * @param \AppBundle\Entity\GrowthData $page
+     */
+    public function removePage(\AppBundle\Entity\GrowthData $page)
+    {
+        $this->pages->removeElement($page);
+    }
+
+    /**
+     * Get pages
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getPages()
+    {
+        return $this->pages;
+    }
+}

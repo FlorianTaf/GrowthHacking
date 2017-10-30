@@ -2,6 +2,7 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\Entity\User;
 use BC\BUNDLE\Controller\JsonController;
 use AppBundle\Entity\GrowthData;
 use Facebook\Facebook;
@@ -15,16 +16,6 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class GrowthController extends Controller
 {
-    private function getFacebookApi()
-    {
-        $fb = new Facebook([
-            'app_id' => '151487542123473',
-            'app_secret' => '5fb4fd9c7785c7da8a147587fea161d8',
-            'default_graph_version' => 'v2.5',
-        ]);
-        return $fb;
-    }
-
     /*
      * desc:
      * - Return a view with all the page found on fb with the keyword
@@ -32,6 +23,7 @@ class GrowthController extends Controller
     public function listPagesAction(Request $request) {
         $token = $request->request->get("token");
         $keyword = $request->request->get("keyword");
+        $pages = $request->request->get("pages");
 
         //Initialize FB var
         $fb = $this->getFacebookApi();
@@ -49,18 +41,16 @@ class GrowthController extends Controller
         );
         $request->setAccessToken($token);
 
-        //Check if pages are in database
-        $dataRepository = $this->getDoctrine()->getRepository('AppBundle:GrowthData');
-
         // Send the request to Graph
         $response = $fb->getClient()->sendRequest($request);
         $tabResult= $response->getGraphEdge()->asArray();
 
+        //Check if pages are in database for the user logged in
+        $userPages = $this->getUserPagesRepository($pages, 'facebook', 0);
 
-        $allPages = $dataRepository->findAll();
         $webSiteIds = array();
-        foreach ($allPages as $page) {
-            $webSiteIds[] = $page->getWebSiteId();
+        foreach ($userPages as $userPage) {
+            $webSiteIds[] = $userPage->getWebSiteId();
         }
 
         $pagesArray = array();
@@ -291,17 +281,14 @@ class GrowthController extends Controller
      * @desc:
      * - List all added pages in database
      */
-    public function listAddedPagesAction() {
+    public function listAddedPagesAction(Request $request) {
+        $pages = $request->request->get('pages');
         //Get the array of pages
-        $pagesArray = $this->getDoctrine()->getManager()->getRepository('AppBundle:GrowthData')->findBy(array(
-            'type'=>"page", 'website'=>'facebook', 'softDelete'=>0), array(
-                'id' => 'DESC'));
+        $pagesArray = $this->getUserPagesRepository($pages, 'facebook', 0);
 
         $resultArray = array();
-        $resultIdArray = array();
         foreach ($pagesArray as $page) {
             $resultArray[] = array('id'=>$page->getWebsiteId(), 'name'=>$page->getName());
-            $resultIdArray[] = $page->getWebsiteId();
         }
 
         $resultView = $this->renderView('AppBundle:Templates:pagesFacebookAdded.html.twig', array('tabResult'=>$resultArray));
@@ -391,11 +378,10 @@ class GrowthController extends Controller
      */
     public function listTwitterAction(Request $request) {
         $keyword = $request->request->get("keyword");
+        $pages = $request->request->get("pages");
 
         //Check if pages are in database
-        $dataRepository = $this->getDoctrine()->getRepository('AppBundle:GrowthData');
-        $pageQuery = $dataRepository->getPagesInDatabase($keyword, 'twitter');
-        $pagesArray = $pageQuery->getResult();
+        $pagesArray = $this->getUserPagesRepository($pages, 'twitter', 1);
         $pagesIdArray = $this->makeFieldArray($pagesArray, 'websiteId');
 
         //Twitter search
@@ -418,17 +404,10 @@ class GrowthController extends Controller
             );
         }
 
-        //check to see if user has been contacted already
-        $contactedUsersArray = array();
-        $contactedUsers = $this->getDoctrine()->getManager()->getRepository('AppBundle:GrowthData')->findBy(array(
-            'type'=>"user", 'website'=>'twitter', 'softDelete'=>0,'isContacted'=>1), array(
-                'id' => 'DESC'));
 
-        foreach ($contactedUsers as $user) {
-            array_push($contactedUsersArray, $user->getWebsiteId());
-        }
         $result = $this->renderView('AppBundle:Templates:usersTwitterFound.html.twig', array(
-            'tabResult'=>$tabResult, 'pagesVerifArray'=>$pagesIdArray, 'contactedUsers'=>$contactedUsersArray));
+            'tabResult'=>$tabResult,
+            'contactedUsers'=>$pagesIdArray));
 
         return new JsonResponse(
             array(
@@ -443,11 +422,10 @@ class GrowthController extends Controller
      * @desc:
      * - List all added users from twitter in database
      */
-    public function listContactedUsersTwitterAction() {
+    public function listContactedUsersTwitterAction(Request $request) {
+        $pages = $request->request->get("pages");
         //Get the array of user
-        $contactedUsersArray = $this->getDoctrine()->getManager()->getRepository('AppBundle:GrowthData')->findBy(array(
-            'type'=>"user", 'website'=>'twitter', 'softDelete'=>0,'isContacted'=>1), array(
-                'id' => 'DESC'));
+        $contactedUsersArray = $this->getUserPagesRepository($pages, 'twitter', 1);
 
         $resultArray = array();
         foreach ($contactedUsersArray as $user) {
@@ -549,5 +527,76 @@ class GrowthController extends Controller
                 'response' => $response,
                 'mail' => $email,
         ));
+    }
+
+    public function checkUserBddAction(Request $request)
+    {
+        $email = $request->request->get('email');
+        $em = $this->getDoctrine()->getManager();
+
+        $emailPresent = $em->getRepository('AppBundle:User')->findOneBy(array('username' => $email));
+
+        $response = null;
+        $pages = null;
+
+        if ($emailPresent == null) {
+            $username = new User();
+            $username->setUsername($email);
+            $username->setDateFirstConnexion(new \DateTime());
+            $em->persist($username);
+            $em->flush();
+
+            $response = "L'email n'était pas présent";
+        } else {
+            $response = "L'email était déjà présent. L'utilisateur a ajouté " . count($pages) . " pages.";
+            $pagesArray = $this->getUserPagesArray($emailPresent);
+        }
+
+        return new JsonResponse(
+            array(
+                'response' => $response,
+                'pages' => $pagesArray
+            )
+        );
+    }
+
+    /**
+     * @return Identifiants pour notre Api Facebook
+     */
+    private function getFacebookApi()
+    {
+        $fb = new Facebook([
+            'app_id' => '151487542123473',
+            'app_secret' => '5fb4fd9c7785c7da8a147587fea161d8',
+            'default_graph_version' => 'v2.5',
+        ]);
+        return $fb;
+    }
+
+    /**
+     * @param $username
+     * @return Les pages concernant l'utilisateur en paramètre (sous forme de tableau)
+     */
+    private function getUserPagesArray($username)
+    {
+        $userPages = $username->getPages();
+        $userPagesArray = array();
+        foreach ($userPages as $userPage) {
+            $userPagesArray[] = $userPage->getWebSiteId();
+        }
+
+        return $userPagesArray;
+    }
+
+    //Simple requête repository, mais qui va nous servir à plusieurs endroits
+    public function getUserPagesRepository($pages, $website, $isContacted)
+    {
+        $userPages = $this->getDoctrine()->getRepository('AppBundle:GrowthData')->findBy(array(
+            'websiteId' => $pages,
+            'website' => $website,
+            'softDelete' => 0,
+            'isContacted' => $isContacted
+        ));
+        return $userPages;
     }
 }

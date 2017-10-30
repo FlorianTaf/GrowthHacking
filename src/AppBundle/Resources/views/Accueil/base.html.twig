@@ -7,10 +7,19 @@
         {% image '@AppBundle/Resources/public/images/*'%}
             <img src="{{ asset_url }}" alt="" />
         {% endimage %}
-        {% block stylesheets %}{% endblock %}
+        {% stylesheets '@AppBundle/Resources/public/css/*' %}
+            <link rel="stylesheet" href="{{ asset_url }}">
+            <link href="http://rawgit.com/saribe/toastr8/master/dist/css/toastr8.min.css" rel="stylesheet"/>
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+        {% endstylesheets %}
     </head>
     <body>
     {% block body %}{% endblock %}
-    {% block javascripts %}{% endblock %}
+    {% javascripts '@AppBundle/Resources/public/js/*' %}
+        <script src="{{ asset_url }}"></script>
+        <script src="{{ path('fos_js_routing_js', { callback: 'fos.Router.setData' }) }}"></script>
+        <script src="http://rawgit.com/saribe/toastr8/master/dist/js/toastr8.min.js"></script>
+    {% endjavascripts %}
+    {% block js %}{% endblock %}
     </body>
 </html>

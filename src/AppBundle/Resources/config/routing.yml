@@ -1,5 +1,5 @@
 growth_hacking_homepage:
-    path:     /growth_hacking
+    path:     /
     defaults: { _controller: AppBundle:Accueil:index }
 
 growth_ajax_list_pages:
@@ -74,6 +74,8 @@ growth_ajax_list_users_twitter:
     options:
         expose: true
 
+
+
 growth_ajax_list_contacted_users_twitter:
     path:     /ajax/growth/listContactedTwitterUser
     defaults: { _controller: AppBundle:Growth:listContactedUsersTwitter }
@@ -95,5 +97,13 @@ growth_ajax_user_bluesquare:
     defaults: { _controller: AppBundle:Growth:userExistsBlueSquare }
     requirements:
         methods:  POST
+    options:
+        expose: true
+
+growth_check_user_bdd:
+    path:     /growth/checkUserBdd
+    defaults: { _controller: AppBundle:Growth:checkUserBdd }
+    requirements:
+        methods: POST
     options:
         expose: true
