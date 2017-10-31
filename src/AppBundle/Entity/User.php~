@@ -8,7 +8,7 @@ use Doctrine\ORM\Mapping as ORM;
  * User
  *
  * @ORM\Table(name="user")
- * @ORM\Entity(repositoryClass="AppBundle\Repository\UserRepository")
+ * @ORM\Entity(repositoryClass="AppBundle\Entity\UserRepository")
  */
 class User
 {
@@ -40,6 +40,18 @@ class User
      * @ORM\JoinTable(name="user_pages")
      */
     private $pages;
+
+    /**
+     * @ORM\ManyToMany(targetEntity="AppBundle\Entity\GrowthData", cascade={"persist", "remove"})
+     * @ORM\JoinTable(name="user_twitter_users_contacted")
+     */
+    private $usersTwitterContacted;
+
+    /**
+     * @ORM\ManyToMany(targetEntity="AppBundle\Entity\GrowthData", cascade={"persist", "remove"})
+     * @ORM\JoinTable(name="user_facebook_users_contacted")
+     */
+    private $usersFacebookContacted;
 
 
     /**
@@ -99,5 +111,79 @@ class User
     {
         return $this->dateFirstConnexion;
     }
-}
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        $this->pages = new \Doctrine\Common\Collections\ArrayCollection();
+    }
 
+    /**
+     * Add page
+     *
+     * @param \AppBundle\Entity\GrowthData $page
+     *
+     * @return User
+     */
+    public function addPage(\AppBundle\Entity\GrowthData $page)
+    {
+        $this->pages[] = $page;
+
+        return $this;
+    }
+
+    /**
+     * Remove page
+     *
+     * @param \AppBundle\Entity\GrowthData $page
+     */
+    public function removePage(\AppBundle\Entity\GrowthData $page)
+    {
+        $this->pages->removeElement($page);
+    }
+
+    /**
+     * Get pages
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getPages()
+    {
+        return $this->pages;
+    }
+
+    /**
+     * Add usersTwitterContacted
+     *
+     * @param \AppBundle\Entity\GrowthData $usersTwitterContacted
+     *
+     * @return User
+     */
+    public function addUsersTwitterContacted(\AppBundle\Entity\GrowthData $usersTwitterContacted)
+    {
+        $this->usersTwitterContacted[] = $usersTwitterContacted;
+
+        return $this;
+    }
+
+    /**
+     * Remove usersTwitterContacted
+     *
+     * @param \AppBundle\Entity\GrowthData $usersTwitterContacted
+     */
+    public function removeUsersTwitterContacted(\AppBundle\Entity\GrowthData $usersTwitterContacted)
+    {
+        $this->usersTwitterContacted->removeElement($usersTwitterContacted);
+    }
+
+    /**
+     * Get usersTwitterContacted
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getUsersTwitterContacted()
+    {
+        return $this->usersTwitterContacted;
+    }
+}

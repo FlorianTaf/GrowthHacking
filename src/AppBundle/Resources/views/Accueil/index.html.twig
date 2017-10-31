@@ -114,6 +114,8 @@
                 var accessToken;
                 var pages;
                 var email;
+                var usersTwitterContacted;
+                var usersFacebookContacted;
 
                 /*
                  * After we get token we can do what we want
@@ -139,7 +141,6 @@
                                 $.post(path, json, function (response) {
                                     $('#loadUser').hide();
                                     var userExists = response.response.userInBDD;
-                                    console.log('Réponse in view : ' + userExists );
                                     if (userExists == false) {
                                         toastr8.error({
                                             title: "Inscription to BlueSquare mandatory !",
@@ -152,7 +153,11 @@
                                         var path = Routing.generate('growth_check_user_bdd');
                                         var json = {"email" : email};
                                         $.post(path, json, function (response) {
+                                            //On enregistre nos pages ajoutées et utilisateurs contactés pour l'utilisateur qui vient de s'identifier
                                             pages = response.pages;
+                                            usersTwitterContacted = response.usersTwitterContacted;
+                                            usersFacebookContacted = response.usersFacebookContacted;
+
                                             var userImg = "http://graph.facebook.com/" + idUser + "/picture?type=normal";
                                             toastr8.facebook({
                                                 message: 'Hello ' + nameUser + ' !',
@@ -194,7 +199,7 @@
                     var token = accessToken;
                     console.log("Token contacted user : " + accessToken);
                     var path = Routing.generate("growth_ajax_list_users");
-                    var json = {"token": token};
+                    var json = {"token": token, "pages": pages, "usersFacebookContacted": usersFacebookContacted };
 
                     $.post(path, json, function (response) {
                         $('#tab-data-user').html('');
@@ -215,7 +220,7 @@
                     $('#tab-added-page').html('Loading ..');
                     //show added pages
                     var path = Routing.generate("growth_ajax_list_added_pages");
-                    var json = { "pages": pages };
+                    var json = {"pages": pages};
 
                     $.post(path, json, function (response) {
                         $('#tab-added-page').html('');
@@ -236,7 +241,7 @@
                     $('#tab-contacted-user').html('Loading ..');
                     //show contacted user
                     var path = Routing.generate("growth_ajax_list_contacted_users");
-                    var json = {};
+                    var json = {"usersFacebookContacted": usersFacebookContacted };
 
                     $.post(path, json, function (response) {
                         $('#tab-contacted-user').html('');
@@ -254,10 +259,8 @@
                     var keyword = $('#input-keyword').val();
                     var path = Routing.generate("growth_ajax_list_pages");
                     var json = {"token": token, "keyword": keyword, "pages": pages};
-                    console.log("Token " + token + ", Keyword : " + keyword);
 
                     $.post(path, json, function (response) {
-                        console.log("Response : " + response.response);
                         $('#tab-data-page').html('');
                         //display in the div
                         $('#tab-data-page').append(response.result);
@@ -269,13 +272,12 @@
                     var id = button.attr("data-id");
                     var name = button.attr("data-name");
 
-                    console.log("add page : " + id);
-
                     //call to server to add in database
                     var path = Routing.generate("growth_add_page");
                     var json = {"id": id, 'name': name, "email": email };
 
                     $.post(path, json, function (response) {
+                        pages = response.pages;
                         //display in the div
                         switchButton(button);
                     });
@@ -286,12 +288,11 @@
                     var id = button.attr("data-id");
                     var name = button.attr("data-name");
 
-                    console.log("del page : " + id);
-
                     var path = Routing.generate("growth_delete_page");
-                    var json = {"id": id, 'name': name};
+                    var json = {"id": id, 'name': name , "email": email};
 
                     $.post(path, json, function (response) {
+                        pages = response.pages;
                         //display in the div
                         if (response.code != 500)
                             switchButton(button);
@@ -304,12 +305,11 @@
                     var name = button.attr("data-name");
                     var ligneTab = $('tr[data-id = ' + id + ']');
 
-                    console.log("del page : " + id);
-
                     var path = Routing.generate("growth_delete_page");
                     var json = {"id": id, 'name': name, "email": email };
 
                     $.post(path, json, function (response) {
+                        pages = response.pages;
                         //display in the div
                         if (response.code != 500)
                             ligneTab.fadeOut();
@@ -321,7 +321,6 @@
                     var json = {};
 
                     $.post(path, json, function (response) {
-                        console.log(response.msg);
                         $('#tab-added-page').html('Loading ..');
                         //show added pages
                         var path = Routing.generate("growth_ajax_list_added_pages");
@@ -341,13 +340,12 @@
                     var id = button.attr("data-id");
                     var name = button.attr("data-name");
 
-                    console.log("contact user : " + id);
-
                     //call to server to add in database
                     var path = Routing.generate("growth_contact_user");
-                    var json = {"id": id, 'name': name};
+                    var json = {"id": id, 'name': name, "email": email, "usersFacebookContacted" : usersFacebookContacted };
 
                     $.post(path, json, function (response) {
+                        usersFacebookContacted = response.usersFacebookContacted;
                         //display in the div
                         switchButton(button);
                     });
@@ -375,7 +373,7 @@
                     //var token = accessToken;
                     var keyword = $('#input-keyword-twitter').val();
                     var path = Routing.generate("growth_ajax_list_users_twitter");
-                    var json = {"keyword": keyword, "pages": pages };
+                    var json = {"keyword": keyword, "usersTwitterContacted": usersTwitterContacted };
 
                     $.post(path, json, function (response) {
                         $('#tab-twitter-user').html('');
@@ -396,7 +394,7 @@
                     $('#tab-contacted-twitter-user').html('Loading ..');
                     //show contacted user
                     var path = Routing.generate("growth_ajax_list_contacted_users_twitter");
-                    var json = { "pages": pages };
+                    var json = {"usersTwitterContacted": usersTwitterContacted };
 
                     $.post(path, json, function (response) {
                         $('#tab-contacted-twitter-user').html('');
@@ -412,13 +410,12 @@
                     var name = button.attr("data-name");
                     var info = button.attr("data-info");
 
-                    console.log("contact twitter user : " + id);
-
                     //call to server to add in database
                     var path = Routing.generate("growth_contact_twitter_user");
-                    var json = {"id": id, 'name': name, 'info': info};
+                    var json = {"id": id, 'name': name, 'info': info, "usersTwitterContacted": usersTwitterContacted, "email": email };
 
                     $.post(path, json, function (response) {
+                        usersTwitterContacted = response.usersTwitterContacted;
                         //display in the div
                         switchButton(button);
                     });
@@ -428,7 +425,6 @@
 
             function getLoginStatus(display) {
                 FB.getLoginStatus(function(response) {
-                    console.log("Connecté ou pas : " + response.status);
                     if (response.status != 'unknown') {
                         if (display == 'pages') {
                             $('#search-page-container').show();

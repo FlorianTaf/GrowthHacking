@@ -21,7 +21,6 @@ class GrowthDataRepository extends EntityRepository
             ->setParameter('type', '%page%')
             ->andWhere('g.website like :website')
             ->setParameter('website', '%'.$website.'%')
-            ->andWhere('g.softDelete = 0')
             ->getQuery();
     }
 
@@ -32,7 +31,6 @@ class GrowthDataRepository extends EntityRepository
             ->setParameter('type', '%page%')
             ->andWhere('g.website like :website')
             ->setParameter('website', '%facebook%')
-            ->andWhere('g.softDelete = 0')
             ->getQuery();
     }
 }

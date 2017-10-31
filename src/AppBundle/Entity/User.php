@@ -37,9 +37,21 @@ class User
 
     /**
      * @ORM\ManyToMany(targetEntity="AppBundle\Entity\GrowthData", cascade={"persist", "remove"})
-     * @ORM\JoinTable(name="user_pages")
+     * @ORM\JoinTable(name="user_pages_facebook")
      */
     private $pages;
+
+    /**
+     * @ORM\ManyToMany(targetEntity="AppBundle\Entity\GrowthData", cascade={"persist", "remove"})
+     * @ORM\JoinTable(name="user_twitter_users_contacted")
+     */
+    private $usersTwitterContacted;
+
+    /**
+     * @ORM\ManyToMany(targetEntity="AppBundle\Entity\GrowthData", cascade={"persist", "remove"})
+     * @ORM\JoinTable(name="user_facebook_users_contacted")
+     */
+    private $usersFacebookContacted;
 
 
     /**
@@ -139,5 +151,73 @@ class User
     public function getPages()
     {
         return $this->pages;
+    }
+
+    /**
+     * Add usersTwitterContacted
+     *
+     * @param \AppBundle\Entity\GrowthData $usersTwitterContacted
+     *
+     * @return User
+     */
+    public function addUsersTwitterContacted(\AppBundle\Entity\GrowthData $usersTwitterContacted)
+    {
+        $this->usersTwitterContacted[] = $usersTwitterContacted;
+
+        return $this;
+    }
+
+    /**
+     * Remove usersTwitterContacted
+     *
+     * @param \AppBundle\Entity\GrowthData $usersTwitterContacted
+     */
+    public function removeUsersTwitterContacted(\AppBundle\Entity\GrowthData $usersTwitterContacted)
+    {
+        $this->usersTwitterContacted->removeElement($usersTwitterContacted);
+    }
+
+    /**
+     * Get usersTwitterContacted
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getUsersTwitterContacted()
+    {
+        return $this->usersTwitterContacted;
+    }
+
+    /**
+     * Add usersFacebookContacted
+     *
+     * @param \AppBundle\Entity\GrowthData $usersFacebookContacted
+     *
+     * @return User
+     */
+    public function addUsersFacebookContacted(\AppBundle\Entity\GrowthData $usersFacebookContacted)
+    {
+        $this->usersFacebookContacted[] = $usersFacebookContacted;
+
+        return $this;
+    }
+
+    /**
+     * Remove usersFacebookContacted
+     *
+     * @param \AppBundle\Entity\GrowthData $usersFacebookContacted
+     */
+    public function removeUsersFacebookContacted(\AppBundle\Entity\GrowthData $usersFacebookContacted)
+    {
+        $this->usersFacebookContacted->removeElement($usersFacebookContacted);
+    }
+
+    /**
+     * Get usersFacebookContacted
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getUsersFacebookContacted()
+    {
+        return $this->usersFacebookContacted;
     }
 }

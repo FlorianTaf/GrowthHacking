@@ -62,20 +62,6 @@ class GrowthData {
      */
     private $info;
 
-    /**
-     * @var integer
-     *
-     * @ORM\Column(name="softDelete", type="integer")
-     */
-    private $softDelete;
-
-    /**
-     * @var integer
-     *
-     * @ORM\Column(name="isContacted", type="integer")
-     */
-    private $isContacted;
-
     /* Methods */
 
     /**
@@ -164,38 +150,5 @@ class GrowthData {
     public function setInfo($info)
     {
         $this->info = $info;
-    }
-
-
-    /**
-     * @return int
-     */
-    public function getSoftDelete()
-    {
-        return $this->softDelete;
-    }
-
-    /**
-     * @param int $softDelete
-     */
-    public function setSoftDelete($softDelete)
-    {
-        $this->softDelete = $softDelete;
-    }
-
-    /**
-     * @return int
-     */
-    public function getIsContacted()
-    {
-        return $this->isContacted;
-    }
-
-    /**
-     * @param int $isContacted
-     */
-    public function setIsContacted($isContacted)
-    {
-        $this->isContacted = $isContacted;
     }
 }
