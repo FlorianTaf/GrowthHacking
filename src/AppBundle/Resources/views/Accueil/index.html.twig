@@ -152,7 +152,6 @@
                                         var path = Routing.generate('growth_check_user_bdd');
                                         var json = {"email" : email};
                                         $.post(path, json, function (response) {
-                                            console.log("Utilisateur : " + response.response);
                                             pages = response.pages;
                                             var userImg = "http://graph.facebook.com/" + idUser + "/picture?type=normal";
                                             toastr8.facebook({
@@ -326,7 +325,7 @@
                         $('#tab-added-page').html('Loading ..');
                         //show added pages
                         var path = Routing.generate("growth_ajax_list_added_pages");
-                        var json = {};
+                        var json = {"email": email };
 
                         $.post(path, json, function (response) {
                             $('#tab-added-page').html('');

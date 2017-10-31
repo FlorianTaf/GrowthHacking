@@ -113,11 +113,9 @@ class GrowthController extends Controller
                 $entityExist->setSoftDelete(0); //set it to 0
                 $user->addPage($entityExist);
                 $msg = "Page déjà ajoutée -> softDelete set to 0";
+                $em->flush();
             }else
                 $msg = "Page déjà ajoutée -> pas d'ajout";
-
-            //save
-            $em->persist($entityExist);
         } else {
             $entity = new GrowthData();
             $name = $request->request->get('name');
@@ -263,11 +261,18 @@ class GrowthController extends Controller
      * @desc:
      * - Empty all pages in database
      */
-    public function emptyAllAction() {
+    public function emptyAllAction(Request $request) {
+        $email = $request->request->get("email");
         $em = $this->getDoctrine()->getManager();
-        $dataRepository = $this->getDoctrine()->getRepository('AppBundle:GrowthData');
+        $dataRepository = $em->getRepository('AppBundle:GrowthData');
+        $user = $em->getRepository('AppBundle:User')->findOneBy(array('username' => $email));
 
-        //Get an array of pages
+        $userPages = $user->getPages();
+        foreach ($userPages as $userPage) {
+            $userPage->setSoftDelete(1);
+        }
+
+        /*
         $pageQuery = $dataRepository->deleteAllAddedPages();
         $pagesArray = $pageQuery->getResult();
 
@@ -275,6 +280,7 @@ class GrowthController extends Controller
             $pages->setSoftDelete(1);
             $em->persist($pages);
         }
+        */
         $em->flush();
 
         return new JsonResponse(
@@ -553,16 +559,12 @@ class GrowthController extends Controller
             $username->setDateFirstConnexion(new \DateTime());
             $em->persist($username);
             $em->flush();
-
-            $response = "L'email n'était pas présent";
         } else {
-            $response = "L'email était déjà présent. L'utilisateur a ajouté " . count($pages) . " pages.";
             $pagesArray = $this->getUserPagesArray($emailPresent);
         }
 
         return new JsonResponse(
             array(
-                'response' => $response,
                 'pages' => $pagesArray
             )
         );
