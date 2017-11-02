@@ -77,20 +77,6 @@ class GrowthController extends Controller
 
     /*
      * @desc:
-     * - Return an array with the field's value of each entity
-     */
-    private function makeFieldArray($entities, $nameField) {
-        $result = array();
-
-        foreach($entities as $entity) {
-            $result[] = $entity->{'get'.ucfirst($nameField)}();
-        }
-
-        return $result;
-    }
-
-    /*
-     * @desc:
      * - Add a new page in database
      */
     public function addPageAction(Request $request)
