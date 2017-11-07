@@ -532,7 +532,8 @@ class GrowthController extends Controller
 
     /**
      * @param Request $request
-     * @return Les pages ajoutées et utilisateurs contactés de l'utilisateur
+     * Retourne les pages déjà ajoutées par l'utilisateur en paramètre
+     * @return JsonResponse
      *
      */
     public function checkUserBddAction(Request $request)
@@ -542,9 +543,9 @@ class GrowthController extends Controller
 
         $emailPresent = $em->getRepository('AppBundle:User')->findOneBy(array('username' => $email));
 
-        $response = null;
-        $pages = null;
-        $contactedTwitterUsers = null;
+        $pagesArray = null;
+        $contactedTwitterUsersArray = null;
+        $contactedFacebookUsersArray = null;
 
         if ($emailPresent == null) {
             $username = new User();
@@ -568,7 +569,7 @@ class GrowthController extends Controller
     }
 
     /**
-     * @return Identifiants pour notre Api Facebook
+     * @return Facebook pour notre Api Facebook
      */
     private function getFacebookApi()
     {
@@ -597,7 +598,8 @@ class GrowthController extends Controller
 
     /**
      * @param $username
-     * @return Les utilisateurs contactés concernant l'utilisateur en paramètre ainsi que le site (Facebook ou Twitter) (sous forme de tableau)
+     * Retourne les utilisateurs contactés concernant l'utilisateur en paramètre ainsi que le site (Facebook ou Twitter)
+     * @return array
      */
     private function getContactedUsersArray($username, $website)
     {
