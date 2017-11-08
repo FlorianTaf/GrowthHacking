@@ -199,9 +199,10 @@
                     var token = accessToken;
                     console.log("Token contacted user : " + accessToken);
                     var path = Routing.generate("growth_ajax_list_users");
-                    var json = {"token": token, "pages": pages, "usersFacebookContacted": usersFacebookContacted };
+                    var json = {"token": token, "usersFacebookContacted": usersFacebookContacted };
 
                     $.post(path, json, function (response) {
+                        usersFacebookContacted = response.usersFacebookContacted;
                         $('#tab-data-user').html('');
                         //display in the div
                         $('#tab-data-user').append(response.result);
