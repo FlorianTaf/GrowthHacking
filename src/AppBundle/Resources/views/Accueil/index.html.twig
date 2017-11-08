@@ -318,9 +318,10 @@
                 //if we click to delete all pages
                 $(document).on('click', '#del-pages-btn', function () {
                     var path = Routing.generate('growth_delete_all_pages');
-                    var json = {};
+                    var json = {"email": email};
 
                     $.post(path, json, function (response) {
+                        pages = response.pages;
                         $('#tab-added-page').html('Loading ..');
                         //show added pages
                         var path = Routing.generate("growth_ajax_list_added_pages");

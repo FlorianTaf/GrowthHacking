@@ -240,7 +240,6 @@ class GrowthController extends Controller
     public function emptyAllAction(Request $request) {
         $email = $request->request->get("email");
         $em = $this->getDoctrine()->getManager();
-        $dataRepository = $em->getRepository('AppBundle:GrowthData');
         $user = $em->getRepository('AppBundle:User')->findOneBy(array('username' => $email));
 
         $userPages = $user->getPages();
@@ -253,6 +252,7 @@ class GrowthController extends Controller
         return new JsonResponse(
             array(
                 'success'=>true,
+                'pages' => $this->getUserPagesArray($user)
             )
         );
     }
